@@ -1,0 +1,272 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Araç Filo Takibi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --ekap-green: #28a745; --ekap-blue: #1a5695; --bg-gray: #f4f7fa; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .nav-capsule a:hover { color: var(--ekap-green); }
+        .nav-capsule a.active { color: var(--ekap-green); font-weight: 700; }
+
+        .nav-upload-btn { background: var(--ekap-blue); color: white !important; padding: 6px 15px; border-radius: 20px; font-weight: 800 !important; box-shadow: 0 2px 8px rgba(26, 86, 149, 0.3); }
+
+        .portal-container { display: flex; padding: 25px 40px; gap: 25px; }
+        .filter-panel { width: 300px; background: white; border-radius: 12px; padding: 20px; border: 1px solid #e0e6ed; height: fit-content; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        .ihale-card { background: white; border-radius: 12px; border: 1px solid #e0e6ed; padding: 20px; margin-bottom: 12px; transition: 0.2s; border-left: 5px solid var(--ekap-blue); cursor: pointer; }
+        .ihale-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .ihale-card.musait { border-left-color: var(--ekap-green); }
+        .ihale-card.kullanimda { border-left-color: #dc3545; }
+
+        .history-box { display: none; margin-top: 15px; padding: 15px; border-top: 1px dashed #ddd; background-color: #f8f9fa; border-radius: 0 0 10px 10px; }
+        .history-table { font-size: 11px; background-color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}">
+            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+        </a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
+            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
+            </a>
+            <a href="{% url 'arabalar_sayfasi' %}" class="active">Arabalar</a>
+            <div style="width:1px; height:20px; background:#ddd;"></div>
+            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
+            <a href="{% url 'mesailerim_sayfasi' %}">Mesailerim</a>
+            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-uppercase" style="font-size: 11px; color: var(--ekap-blue);">{{ user.username }}</span>
+            <form action="/admin/logout/" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="portal-container">
+        <aside class="filter-panel">
+            <form method="GET" action="{% url 'arabalar_sayfasi' %}">
+                <h6 class="fw-bold border-bottom pb-2 mb-3 text-success"><i class="fas fa-filter me-2"></i>Araç Sorgulama</h6>
+                <div class="mb-3">
+                    <label class="small fw-bold">Plaka / Model Ara</label>
+                    <input type="text" name="q" class="form-control form-control-sm" placeholder="Örn: 34 MEY ..." value="{{ request.GET.q|default:'' }}">
+                </div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Kullanım Durumu</label>
+                    <select name="durum" class="form-select form-select-sm">
+                        <option value="">Tümü</option>
+                        <option value="musait" {% if request.GET.durum == 'musait' %}selected{% endif %}>Müsait Araçlar</option>
+                        <option value="kullanimda" {% if request.GET.durum == 'kullanimda' %}selected{% endif %}>Kullanımdaki Araçlar</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success btn-sm w-100 fw-bold mb-2">SORGULA</button>
+                <a href="{% url 'arabalar_sayfasi' %}" class="btn btn-light btn-sm w-100 border fw-bold">TEMİZLE</a>
+            </form>
+            <hr>
+            <button class="btn btn-primary btn-sm w-100 fw-bold" style="background: var(--ekap-blue);" data-bs-toggle="modal" data-bs-target="#yeniAracModal">
+                <i class="fas fa-plus me-1"></i> YENİ ARAÇ TANIMLA
+            </button>
+        </aside>
+
+        <main style="flex:1;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0">Araç Filo Listesi</h5>
+                <small class="text-muted">Toplam: {{ araclar|length }} Araç</small>
+            </div>
+
+            {% for arac in araclar %}
+            <div class="ihale-card shadow-sm {% if arac.su_an_kullanimda %}kullanimda{% else %}musait{% endif %}" onclick="toggleHistory('box-{{ arac.id }}')">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        {% if arac.su_an_kullanimda %}
+                            <span class="badge bg-danger mb-2">KULLANIMDA</span>
+                            <small class="text-muted ms-2">({{ arac.su_an_kullanimda.personel.get_full_name|default:arac.su_an_kullanimda.personel.username }})</small>
+                        {% else %}
+                            <span class="badge bg-success mb-2">MÜSAİT</span>
+                        {% endif %}
+                        <h5 class="fw-bold m-0 text-dark">{{ arac.plaka }}</h5>
+                        <p class="text-muted small m-0">{{ arac.marka_model }}</p>
+                    </div>
+                    
+                    <div class="text-end" onclick="event.stopPropagation()">
+                        {% if not arac.su_an_kullanimda %}
+                            <button class="btn btn-sm btn-outline-primary fw-bold" data-bs-toggle="modal" data-bs-target="#aracAlModal{{ arac.id }}">ARACI AL</button>
+                        {% else %}
+                            <button class="btn btn-sm btn-warning fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#teslimEtModal{{ arac.id }}">TESLİM ET</button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="box-{{ arac.id }}" class="history-box shadow-inner border rounded">
+                    <div class="d-flex justify-content-between mb-2 border-bottom pb-1">
+                        <span class="small fw-bold text-primary"><i class="fas fa-history me-1"></i> Hareket Geçmişi</span>
+                    </div>
+                    <table class="table table-sm history-table mb-0 border rounded">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Personel / İhale</th>
+                                <th>Alış Tarihi & KM</th>
+                                <th>Teslim Tarihi & KM</th>
+                                <th>Not / Görsel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hareket in arac.kullanim_gecmisi.all|dictsortreversed:"alis_tarihi" %}
+                            <tr>
+                                <td>
+                                    <b>{{ hareket.personel.get_full_name|upper|default:hareket.personel.username }}</b><br>
+                                    <span class="text-muted small">{{ hareket.ihale.ihale_adi|truncatechars:30|default:"Genel Görev" }}</span>
+                                </td>
+                                <td>{{ hareket.alis_tarihi|date:"d.m.Y H:i" }} <br> <span class="text-success">{{ hareket.baslangic_km|intcomma }} KM</span></td>
+                                <td>
+                                    {% if hareket.teslim_tarihi %}
+                                        {{ hareket.teslim_tarihi|date:"d.m.Y H:i" }} <br> <span class="text-danger">{{ hareket.bitis_km|intcomma }} KM</span>
+                                    {% else %}
+                                        <span class="text-muted italic">Kullanım sürüyor...</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">
+                                    {{ hareket.teslim_notu|default:"-" }}
+                                    {% if hareket.teslim_gorseli %}
+                                        <br><a href="{{ hareket.teslim_gorseli.url }}" target="_blank" class="badge bg-info text-white text-decoration-none">Görseli Aç</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-2 text-muted">Kayıt bulunamadı.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal fade" id="aracAlModal{{ arac.id }}" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation()">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form method="POST" class="modal-content">
+                        {% csrf_token %}
+                        <input type="hidden" name="arac_id" value="{{ arac.id }}">
+                        <div class="modal-header bg-primary text-white py-2"><h6 class="modal-title">Araç Alış Kaydı ({{ arac.plaka }})</h6></div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="small fw-bold">Personel Seçimi</label>
+                                <select name="personel_id" class="form-select form-select-sm" required>
+                                    {% for p in personeller %}
+                                        <option value="{{ p.id }}" {% if p == request.user %}selected{% endif %}>{{ p.get_full_name|default:p.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small fw-bold">Görevli Olduğu İhale</label>
+                                <select name="ihale_id" class="form-select form-select-sm">
+                                    <option value="">İhale Seçiniz (Opsiyonel)</option>
+                                    {% for ihale in ihaleler %}
+                                        <option value="{{ ihale.id }}">{{ ihale.ihale_adi }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-2">
+                                    <label class="small fw-bold">Alış Kilometresi</label>
+                                    <input type="number" name="baslangic_km" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <label class="small fw-bold">Alış Saati</label>
+                                    <input type="datetime-local" name="alis_tarihi" class="form-control form-control-sm">
+                                    <small class="text-muted" style="font-size: 9px;">Boş bırakılırsa "Şimdi" kaydedilir.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer py-1">
+                            <button type="submit" name="arac_al" class="btn btn-primary btn-sm w-100 fw-bold">ARACI ÜZERİME AL</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal fade" id="teslimEtModal{{ arac.id }}" tabindex="-1" aria-hidden="true" onclick="event.stopPropagation()">
+                <div class="modal-dialog modal-dialog-centered">
+                    <form method="POST" class="modal-content" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="arac_id" value="{{ arac.id }}">
+                        <div class="modal-header bg-warning py-2"><h6 class="modal-title fw-bold">Aracı Teslim Et</h6></div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="small fw-bold">Dönüş Kilometresi</label>
+                                    <input type="number" name="bitis_km" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="small fw-bold">Teslim Zamanı</label>
+                                    <input type="datetime-local" name="teslim_tarihi" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small fw-bold">Teslim Fotoğrafı (KM veya Araç Durumu)</label>
+                                <input type="file" name="teslim_gorseli" class="form-control form-control-sm" accept="image/*">
+                            </div>
+                            <div class="mb-0">
+                                <label class="small fw-bold">Teslim Notu</label>
+                                <textarea name="teslim_notu" class="form-control form-control-sm" rows="2" placeholder="Araçta bir sorun var mı?"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" name="arac_teslim" class="btn btn-warning btn-sm w-100 fw-bold">TESLİM KAYDINI TAMAMLA</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </main>
+    </div>
+
+    <div class="modal fade" id="yeniAracModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" class="modal-content">
+                {% csrf_token %}
+                <div class="modal-header bg-dark text-white"><h6 class="modal-title">Yeni Araç Tanımla</h6></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="small fw-bold">Plaka</label><input type="text" name="plaka" class="form-control" required placeholder="34 MEY 001"></div>
+                    <div class="mb-3"><label class="small fw-bold">Marka / Model</label><input type="text" name="marka" class="form-control" required placeholder="Renault Megane 2023"></div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">Zimmetli Personel (Opsiyonel)</label>
+                        <select name="personel" class="form-select">
+                            <option value="">Zimmet Yok</option>
+                            {% for p in personeller %}
+                                <option value="{{ p.id }}">{{ p.get_full_name|default:p.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="submit" name="arac_ekle" class="btn btn-primary btn-sm px-4 fw-bold">KAYDET</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleHistory(id) {
+            var box = document.getElementById(id);
+            if (box) {
+                box.style.display = (box.style.display === "block") ? "none" : "block";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

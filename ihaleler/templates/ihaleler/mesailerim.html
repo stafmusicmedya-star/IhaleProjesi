@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Mesai ve İş Takibi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        
+        /* NAVBAR (Tam Uyumlu) */
+        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .nav-capsule a:hover { color: var(--ekap-blue); }
+        .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+
+        /* ÖZEL VURGULU DOSYA YÜKLEME BUTONU */
+        .nav-upload-btn { 
+            background: var(--ekap-blue); 
+            color: white !important; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-weight: 800 !important; 
+            box-shadow: 0 2px 8px rgba(26, 86, 149, 0.3);
+        }
+        .nav-upload-btn:hover { background: #144477 !important; transform: scale(1.05); }
+
+        /* MESAİ FORMU */
+        .work-card { 
+            max-width: 800px; 
+            margin: 30px auto; 
+            background: white; 
+            border-radius: 16px; 
+            padding: 30px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f6;
+        }
+        .section-title { 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--ekap-blue); 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+        .form-label { font-weight: 600; color: #555; font-size: 0.9rem; }
+        
+        /* MEDYA YÜKLEME ALANI */
+        .media-upload-box {
+            border: 2px dashed #d1d9e6;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: #fcfdfe;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .media-upload-box:hover {
+            border-color: var(--ekap-blue);
+            background: #f0f7ff;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--ekap-blue);
+            box-shadow: 0 0 0 3px rgba(26, 86, 149, 0.1);
+        }
+
+        .btn-save {
+            background: var(--ekap-blue);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-save:hover {
+            background: #144477;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}">
+            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+        </a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
+            
+            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
+            </a>
+            
+            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
+            
+            <div style="width:1px; height:20px; background:#ddd;"></div>
+            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
+            <a href="{% url 'mesailerim_sayfasi' %}" class="active">Mesailerim</a>
+            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        </div>
+        <div>
+            <span class="fw-bold text-uppercase" style="font-size: 11px; color: #666;">{{ user.username }}</span>
+            <form action="/admin/logout/" method="post" style="display:inline; margin-left: 10px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="work-card">
+            <div class="section-title">
+                <i class="fas fa-business-time"></i> Yeni Mesai / İş Kaydı Oluştur
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label">İlgili İhale / Dosya</label>
+                    <select name="ihale_secimi" class="form-select" required>
+                        <option value="" selected disabled>İşin bağlı olduğu dosyayı seçiniz...</option>
+                        {% for ihale in ihaleler %}
+                            <option value="{{ ihale.id }}">{{ ihale.ihale_no }} - {{ ihale.ihale_adi }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">İşin Yapıldığı Tarih</label>
+                        <input type="date" name="mesai_tarih" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Çalışma Saati (Başlangıç/Bitiş)</label>
+                        <div class="d-flex gap-2">
+                            <input type="time" name="saat_baslangic" class="form-control" placeholder="Başlangıç">
+                            <input type="time" name="saat_bitis" class="form-control" placeholder="Bitiş">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Yapılan İşin Görseli veya Videosu</label>
+                    <div class="media-upload-box" onclick="document.getElementById('fileInput').click();">
+                        <i class="fas fa-camera-retro fa-2x text-muted mb-2"></i>
+                        <p class="mb-0 small text-muted">Medya yüklemek için tıklayın veya sürükleyin</p>
+                        <p style="font-size: 10px;" class="text-primary fw-bold">MP4, JPG, PNG (Maks: 50MB)</p>
+                        <input type="file" id="fileInput" name="medya" hidden accept="image/*,video/*">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Yapılan İşin Detaylı Açıklaması</label>
+                    <textarea name="aciklama" class="form-control" rows="4" placeholder="Neler yapıldı? Hangi aşamalar tamamlandı?"></textarea>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-save w-100">
+                        <i class="fas fa-save me-2"></i> MESAİ KAYDINI TAMAMLA
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('fileInput').onchange = function() {
+            if(this.files.length > 0) {
+                const fileName = this.files[0].name;
+                document.querySelector('.media-upload-box p').innerHTML = "<strong>Seçilen:</strong> " + fileName;
+            }
+        };
+    </script>
+</body>
+</html>

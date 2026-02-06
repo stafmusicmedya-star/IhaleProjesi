@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Dosya Yükleme</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --ekap-blue: #1a5695; --ekap-green: #28a745; --bg-gray: #f4f7fa; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        
+        /* NAVBAR */
+        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .nav-capsule a:hover { color: var(--ekap-blue); }
+        .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+
+        .nav-upload-btn { 
+            background: var(--ekap-blue); 
+            color: white !important; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-weight: 800 !important; 
+            box-shadow: 0 2px 8px rgba(26, 86, 149, 0.3);
+        }
+        .nav-upload-btn:hover { background: #144477 !important; transform: scale(1.05); }
+
+        /* FORM KARTI */
+        .upload-card { 
+            max-width: 900px; 
+            margin: 40px auto; 
+            background: white; 
+            border-radius: 15px; 
+            padding: 40px; 
+            border: 1px solid #e0e6ed; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+        .form-label { font-weight: 600; color: #444; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .upload-area { 
+            border: 2px dashed #cbd5e0; 
+            padding: 30px; 
+            border-radius: 12px; 
+            background: #f8fafc; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            position: relative;
+        }
+        .upload-area:hover { border-color: var(--ekap-blue); background: #f0f7ff; }
+
+        /* AI VURGUSU */
+        .ai-badge {
+            background: linear-gradient(45deg, #1a5695, #6a11cb);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 5px;
+        }
+        
+        .form-control, .form-select { 
+            border-radius: 8px; 
+            border: 1px solid #dce1e7; 
+            padding: 10px 15px;
+            font-size: 0.95rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--ekap-blue);
+            box-shadow: 0 0 0 3px rgba(26, 86, 149, 0.1);
+        }
+
+        .btn-submit-upload {
+            background: var(--ekap-blue);
+            border: none;
+            padding: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-submit-upload:hover {
+            background: #144477;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 86, 149, 0.3);
+        }
+
+        .ikn-separator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            font-weight: bold;
+            color: #ccc;
+            font-size: 1.2rem;
+        }
+
+        /* YÜKLEME EKRANI (OVERLAY) */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .ai-pulse {
+            width: 80px;
+            height: 80px;
+            background: rgba(26, 86, 149, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(26, 86, 149, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(26, 86, 149, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(26, 86, 149, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="ai-pulse mb-4">
+            <i class="fas fa-brain fa-3x text-primary"></i>
+        </div>
+        <h4 class="fw-bold text-dark">Gemini AI Dosyaları Analiz Ediyor...</h4>
+        <p class="text-muted">Bu işlem dosyaların boyutuna göre 10-30 saniye sürebilir.</p>
+        <div class="progress w-25 mt-2" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}">
+            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+        </a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
+            <a href="{% url 'dosya_yukleme' %}" class="active">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
+            </a>
+            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
+            <div style="width:1px; height:20px; background:#ddd;"></div>
+            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
+            <a href="{% url 'mesailerim_sayfasi' %}">Mesailerim</a>
+            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            {% if user.is_authenticated %}
+                <span class="fw-bold text-uppercase" style="font-size: 11px; color: var(--ekap-blue);">{{ user.username }}</span>
+                <form action="/admin/logout/" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-3 shadow-sm border-0 alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="upload-card">
+            <div class="text-center mb-5">
+                <div class="d-inline-block p-3 rounded-circle bg-light mb-3">
+                    <i class="fas fa-robot fa-2x text-primary"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Akıllı Veri Aktarımı</h3>
+                <p class="text-muted">Dosyalarınızı yükleyin; kalemleri, birimleri ve teknik şartları AI otomatik işlesin.</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                {% csrf_token %}
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label class="form-label">İhale / Temin Başlığı</label>
+                        <input type="text" name="ihale_adi" class="form-control" placeholder="Örn: Mobilya ve Mdf Malzeme Alımı" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Kategori</label>
+                        <select name="kategori" class="form-select">
+                            <option value="ihale">İhale (Açık İhale)</option>
+                            <option value="dogrudan">Doğrudan Temin (22/d)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Kurum (Hastane) Adı</label>
+                        <input type="text" name="kurum_adi" class="form-control" placeholder="Örn: Pendik Eğitim ve Araştırma Hastanesi" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">İhale Tarihi</label>
+                        <input type="date" name="tarih" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">İl</label>
+                        <input type="text" name="il" class="form-control" placeholder="Örn: İstanbul">
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label">İhale Kayıt No (İKN)</label>
+                        <div class="d-flex align-items-center">
+                            <input type="text" name="ikn_yil" class="form-control text-center" placeholder="Yıl" maxlength="4" style="width: 100px;" value="2025" required>
+                            <div class="ikn-separator">/</div>
+                            <input type="text" name="ikn_no" class="form-control" placeholder="Sıra No" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Alım Türü</label>
+                        <select name="tur" class="form-select">
+                            <option value="Mal">Mal Alımı</option>
+                            <option value="Hizmet">Hizmet Alımı</option>
+                            <option value="Yapim">Yapım İşi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="my-5">
+
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6">
+                        <div class="upload-area text-center h-100">
+                            <i class="fas fa-file-invoice-dollar fa-2x text-muted mb-2"></i>
+                            <h6 class="fw-bold">Birim Fiyat Cetveli</h6>
+                            <p class="small text-muted">Birim ve Miktar Analizi İçin</p>
+                            <input type="file" name="dosya" class="form-control shadow-sm" accept=".pdf,.xlsx,.xls" required>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="upload-area text-center h-100" style="border-color: #6a11cb; background: #fcfaff;">
+                            <i class="fas fa-scroll fa-2x text-primary mb-2"></i>
+                            <h6 class="fw-bold">Teknik Şartname <span class="ai-badge">KALEM EŞLEŞTİRME</span></h6>
+                            <p class="small text-muted">Ürün Detayları İçin (PDF)</p>
+                            <input type="file" name="teknik_sartname" class="form-control shadow-sm" accept=".pdf,.doc,.docx">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit-upload w-100 shadow" id="submitBtn">
+                    <i class="fas fa-magic me-2"></i> DOSYALARI ANALİZ ET VE SİSTEME İŞLE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form gönderildiğinde yükleme ekranını göster
+        document.getElementById('uploadForm').onsubmit = function() {
+            // Basit bir validasyon kontrolü (dosya seçilmiş mi?)
+            const fileInput = document.querySelector('input[name="dosya"]');
+            if(fileInput.files.length > 0) {
+                document.getElementById('loading-overlay').style.display = 'flex';
+                document.getElementById('submitBtn').disabled = true;
+                document.getElementById('submitBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> AI Verileri İşliyor...';
+            }
+        };
+    </script>
+</body>
+</html>

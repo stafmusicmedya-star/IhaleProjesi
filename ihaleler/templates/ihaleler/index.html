@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | İş Takip Platformu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --ekap-blue: #1a5695; }
+        body { background: #fff; font-family: 'Segoe UI', sans-serif; }
+        
+        /* NAVBAR */
+        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .nav-capsule a:hover { color: var(--ekap-blue); }
+        .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+        
+        /* ÖZEL VURGULU DOSYA YÜKLEME BUTONU */
+        .nav-upload-btn { 
+            background: var(--ekap-blue); 
+            color: white !important; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-weight: 800 !important; 
+            box-shadow: 0 2px 8px rgba(26, 86, 149, 0.3);
+        }
+        .nav-upload-btn:hover { background: #144477 !important; transform: scale(1.05); }
+
+        /* HERO SECTION */
+        .hero-section { padding: 80px 0; text-align: center; background: linear-gradient(180deg, #f1f8ff 0%, #ffffff 100%); min-height: 80vh; }
+        .hero-title { color: #1a5695; font-weight: 700; font-size: 42px; margin-bottom: 20px; }
+        .search-container { max-width: 800px; margin: 0 auto; position: relative; }
+        .main-search { border-radius: 50px; padding: 20px 35px; border: 1px solid #ddd; box-shadow: 0 4px 25px rgba(0,0,0,0.07); font-size: 18px; width: 100%; transition: 0.3s; }
+        .main-search:focus { outline: none; border-color: var(--ekap-blue); box-shadow: 0 4px 25px rgba(26, 86, 149, 0.15); }
+        
+        /* HIZLI TÜRLER */
+        .quick-types { display: flex; justify-content: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+        .type-pill { background: white; border: 1px solid #eee; border-radius: 30px; padding: 8px 25px; color: #666; font-size: 14px; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.03); text-decoration: none; }
+        .type-pill:hover { border-color: var(--ekap-blue); color: var(--ekap-blue); transform: translateY(-2px); }
+
+        /* İSTATİSTİK KARTLARI */
+        .stats-wrapper { margin-top: 60px; }
+        .stat-mini-card { background: white; border-radius: 15px; padding: 20px; border: 1px solid #f0f0f0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.3s; height: 100%; }
+        .stat-mini-card:hover { transform: translateY(-5px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .stat-icon { font-size: 24px; color: var(--ekap-blue); margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #333; display: block; }
+        .stat-label { font-size: 13px; color: #777; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}">
+            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+        </a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}" class="active">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
+            
+            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
+            </a>
+            
+            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
+            
+            <div style="width:1px; height:20px; background:#ddd;"></div>
+            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
+            
+            <a href="{% url 'mesailerim_sayfasi' %}" style="font-weight: 600;">Mesailerim</a>
+            
+            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                <span class="fw-bold me-2 text-uppercase" style="font-size: 11px;">{{ user.username }}</span>
+                <form action="/admin/logout/" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
+                </form>
+            {% else %}
+                <a href="/admin/login/" class="btn btn-primary px-4 fw-bold" style="border-radius: 8px; background: #1a5695;">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Meysa Teknik İş Takip Platformu</h1>
+            <p class="text-muted mb-5 fs-5">İhale, Doğrudan Temin ve Dosya Takip Sistemi</p>
+            
+            <div class="search-container">
+                <form action="{% url 'ihale_listesi' %}" method="GET">
+                    <input type="text" name="q" class="main-search" placeholder="İKN, kurum adı veya ihale adı ile arayın...">
+                </form>
+                
+                <div class="quick-types">
+                    <a href="{% url 'ihale_listesi' %}?tur=Mal" class="type-pill"><i class="fas fa-box me-1"></i> Mal</a>
+                    <a href="{% url 'ihale_listesi' %}?tur=Yapim" class="type-pill"><i class="fas fa-tools me-1"></i> Yapım</a>
+                    <a href="{% url 'ihale_listesi' %}?tur=Hizmet" class="type-pill"><i class="fas fa-concierge-bell me-1"></i> Hizmet</a>
+                    <a href="{% url 'dosya_yukleme' %}" class="type-pill" style="background: #eef5ff; border-color: #1a5695; color: #1a5695; font-weight: 600;">
+                        <i class="fas fa-file-upload me-1"></i> Dosya Yükle
+                    </a>
+                    <a href="{% url 'ihale_listesi' %}?durum=Acik" class="type-pill"><i class="fas fa-unlock me-1"></i> Açık İhaleler</a>
+                </div>
+            </div>
+
+            <div class="stats-wrapper">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-6 col-md-3">
+                        <div class="stat-mini-card">
+                            <i class="fas fa-gavel stat-icon"></i>
+                            <span class="stat-value">{{ toplam_ihale }}</span>
+                            <span class="stat-label">Toplam İhale</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-mini-card">
+                            <i class="fas fa-bolt stat-icon" style="color: #28a745;"></i>
+                            <span class="stat-value">{{ toplam_dogrudan }}</span>
+                            <span class="stat-label">Doğrudan Temin</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stat-mini-card">
+                            <i class="fas fa-hospital stat-icon" style="color: #6f42c1;"></i>
+                            <span class="stat-value">{{ aktif_kurum_sayisi|default:"0" }}</span>
+                            <span class="stat-label">Aktif Kurum</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

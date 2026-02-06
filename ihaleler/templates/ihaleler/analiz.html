@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Analiz ve Raporlar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --meysa-blue: #1a5695; --meysa-green: #28a745; --bg-gray: #f4f7fa; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        
+        /* NAVBAR */
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .nav-capsule a:hover { color: var(--meysa-blue); }
+        .nav-capsule a.active { color: var(--meysa-blue); font-weight: 700; border-bottom: 2px solid var(--meysa-blue); }
+        
+        .nav-upload-btn { 
+            background: var(--meysa-blue); 
+            color: white !important; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-weight: 800 !important; 
+        }
+
+        /* ANALİZ KARTLARI */
+        .stats-card { background: white; border-radius: 15px; border: 1px solid #e0e6ed; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; height: 100%; }
+        .section-title { font-size: 14px; font-weight: 700; color: var(--meysa-blue); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; text-transform: uppercase; }
+        .table-custom { font-size: 13px; }
+        .badge-count { background: #e0f2fe; color: #0369a1; font-weight: 700; border-radius: 8px; padding: 5px 12px; }
+    </style>
+</head>
+<body>
+
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}">
+            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+        </a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
+            
+            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
+            </a>
+            
+            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
+            
+            <div style="width:1px; height:20px; background:#ddd;"></div>
+            <a href="{% url 'analiz_sayfasi' %}" class="active">Analiz</a>
+            <a href="{% url 'mesailerim_sayfasi' %}">Mesailerim</a>
+            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="fw-bold text-uppercase me-2" style="font-size: 11px; color: var(--meysa-blue);">{{ user.username }}</span>
+            <form action="/admin/logout/" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row g-4">
+            
+            <div class="col-md-7">
+                <div class="stats-card p-4">
+                    <h6 class="section-title"><i class="fas fa-hospital me-2"></i>Kurum Bazlı İhale Dağılımı</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-custom">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hastane / Kurum Adı</th>
+                                    <th class="text-center">İhale Sayısı</th>
+                                    <th class="text-end">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for h in hastane_verileri %}
+                                <tr>
+                                    <td><i class="fas fa-chevron-right me-2 text-muted small"></i><strong>{{ h.ad }}</strong></td>
+                                    <td class="text-center">
+                                        <span class="badge-count">{{ h.toplam }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'ihale_listesi' %}?q={{ h.ad }}" class="btn btn-sm btn-outline-primary py-0" style="font-size: 11px;">Görüntüle</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Henüz kayıtlı bir kurum bulunmuyor.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="stats-card p-4">
+                    <h6 class="section-title"><i class="fas fa-box-open me-2"></i>En Çok Talep Edilen Malzemeler</h6>
+                    <div class="list-group list-group-flush table-custom">
+                        {% for urun in en_cok_alinanlar %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                            <div>
+                                <div class="fw-bold">{{ urun.urun_adi|truncatechars:40 }}</div>
+                                <div class="text-muted small">Genel Kullanım</div>
+                            </div>
+                            <span class="badge bg-success rounded-pill px-3">{{ urun.adet_sum|floatformat:0 }}</span>
+                        </div>
+                        {% empty %}
+                        <div class="text-center p-4">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted small">Henüz veri girişi yapılmadı.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded-3 border border-dashed text-center">
+                        <p class="small text-muted mb-0">Raporların Excel çıktısını almak için liste sayfalarını kullanabilirsiniz.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
