@@ -29,9 +29,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Excel / PDF uploads (runtime)
+# Excel / PDF uploads
 ihaleler/cetveller/
 ihaleler/sartnameler/
-
-# Node (ileride gerekirse)
-node_modules/
