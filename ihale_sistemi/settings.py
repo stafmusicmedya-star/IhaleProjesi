@@ -1,15 +1,31 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
-# Proje dizini (Ana klasör)
+# Proje dizini
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Güvenlik Ayarları
-SECRET_KEY = 'django-insecure-l#-3ge-t9v3-mka*8g2@%c7vvb^%5*93ieq%q4e^4!7v$^gc25'
-DEBUG = True
-ALLOWED_HOSTS = []
+# .env yükle
+load_dotenv(BASE_DIR / ".env")
 
-# Uygulama Tanımlamaları
+# =====================
+# GÜVENLİK
+# =====================
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-gecici-key-dev-ortami"
+)
+
+DEBUG = True
+
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+]
+
+# =====================
+# UYGULAMALAR
+# =====================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -17,10 +33,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.humanize',  # Sayıları formatlamak (1.000 gibi) için eklendi
-    'ihaleler',  # Senin uygulaman
+    'django.contrib.humanize',
+
+    'ihaleler',
 ]
 
+# =====================
+# MIDDLEWARE
+# =====================
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -33,13 +53,17 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'ihale_sistemi.urls'
 
+# =====================
+# TEMPLATE
+# =====================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],  # ileride lazım olacak
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -50,7 +74,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ihale_sistemi.wsgi.application'
 
-# Veritabanı
+# =====================
+# DATABASE
+# =====================
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -58,7 +84,9 @@ DATABASES = {
     }
 }
 
-# Şifre Doğrulama
+# =====================
+# PASSWORD
+# =====================
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -66,28 +94,44 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Dil ve Zaman Ayarları
-LANGUAGE_CODE = 'tr-tr'  # Türkçe yapıldı
-TIME_ZONE = 'Europe/Istanbul'  # Türkiye saati yapıldı
+# =====================
+# LOCALE
+# =====================
+LANGUAGE_CODE = 'tr-tr'
+TIME_ZONE = 'Europe/Istanbul'
 USE_I18N = True
 USE_TZ = True
 
-# Sayı ve tarih formatlarının Türkiye standartlarında (noktalı) görünmesi için:
-USE_L10N = True 
 THOUSAND_SEPARATOR = '.'
 NUMBER_GROUPING = 3
 
-# --- STATİK DOSYA AYARLARI ---
-STATIC_URL = 'static/'
+# =====================
+# STATIC
+# =====================
+STATIC_URL = '/static/'
 
-# Django'nun statik dosyaları (logo, css vb.) arayacağı klasör
 STATICFILES_DIRS = [
     BASE_DIR / "ihaleler" / "static",
 ]
 
-# Giriş ve Çıkış Yönlendirmeleri
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# =====================
+# AUTH
+# =====================
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Default auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# =====================
+# GEMINI
+# =====================
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# =====================
+# GEMINI
+# =====================
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+if not GEMINI_API_KEY:
+    raise RuntimeError("GEMINI_API_KEY bulunamadı (.env okunmuyor)")
