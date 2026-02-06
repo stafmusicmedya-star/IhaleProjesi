@@ -1,64 +1,37 @@
-# =====================
 # Python
-# =====================
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
+*.log
 
-# =====================
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+.env
+.env.*
+*.bak
+
 # Virtual Environment
-# =====================
 venv/
 env/
-.venv/
+ENV/
 
-# =====================
-# Django
-# =====================
-*.log
-db.sqlite3
-db.sqlite3-journal
-media/
-
-# =====================
-# Django migrations (istersen açabilirsin)
-# migrations/__pycache__/
-
-# =====================
-# Static files
-# =====================
-staticfiles/
-
-# =====================
-# Environment variables
-# =====================
-.env
-
-# =====================
 # IDE / Editor
-# =====================
 .vscode/
 .idea/
 *.swp
+*.swo
 
-# =====================
 # OS
-# =====================
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# =====================
-# Excel / PDF / Uploads
-# =====================
-*.xlsx
-*.xls
-*.pdf
-*.jpg
-*.jpeg
-*.png
+# Excel / PDF uploads (runtime)
+ihaleler/cetveller/
+ihaleler/sartnameler/
 
-# =====================
-# Git
-# =====================
-.git/
+# Node (ileride gerekirse)
+node_modules/
