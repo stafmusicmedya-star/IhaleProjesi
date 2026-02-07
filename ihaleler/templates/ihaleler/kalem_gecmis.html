@@ -1,0 +1,78 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Ürün Geçmişi – {{ kalem.urun_adi|truncatechars:50 }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --ekap-blue: #1a5695; --ekap-green: #28a745; --bg-gray: #f4f7fa; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Source Sans 3', system-ui, sans-serif; color: var(--text-primary); }
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid var(--border-mid); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .gecmis-kart { background: white; border-radius: 12px; border: 1px solid #e0e6ed; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+        .gecmis-gorsel { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #eee; }
+        .gecmis-body { flex: 1; min-width: 200px; }
+        .gecmis-ihale-adi { font-weight: 700; color: var(--ekap-blue); }
+    </style>
+</head>
+<body>
+
+<nav class="ekap-navbar">
+    <a href="{% url 'ana_sayfa' %}"><img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;"></a>
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+        <a href="/ihale/{{ kalem.ihale_id }}/incele/" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-left me-1"></i> İhaleye Dön</a>
+    </div>
+</nav>
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h5 class="mb-1"><i class="fas fa-history me-2"></i>Ürün Geçmişi</h5>
+        <p class="text-muted mb-0 small">"<strong>{{ kalem.urun_adi }}</strong>" aynı isimle geçtiği ihaleler, görseller, faturalar ve fiyatlar.</p>
+    </div>
+
+    {% for k in gecmis %}
+    <div class="gecmis-kart">
+        <div>
+            {% if k.kalem_gorsel %}
+            <img src="{{ k.kalem_gorsel.url }}" alt="" class="gecmis-gorsel">
+            {% else %}
+            <div class="gecmis-gorsel d-flex align-items-center justify-content-center bg-light text-muted small"><i class="fas fa-image"></i></div>
+            {% endif %}
+        </div>
+        <div class="gecmis-body">
+            <div class="gecmis-ihale-adi">{{ k.ihale.ihale_no }} – {{ k.ihale.ihale_adi }}</div>
+            <div class="small text-muted mb-2"><i class="far fa-calendar-alt me-1"></i> {{ k.ihale.tarih|date:"d.m.Y" }} · {{ k.ihale.hastane.ad }} | {{ k.ihale.il }}</div>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+                <span><strong>Miktar:</strong> {{ k.adet|floatformat:0 }} {{ k.birim }}</span>
+                <span><strong>Birim Fiyat:</strong> {{ k.birim_fiyat|floatformat:2 }} ₺</span>
+                <span><strong>Toplam:</strong> {{ k.toplam_fiyat|floatformat:2 }} ₺</span>
+            </div>
+            {% if k.fatura_dosya %}
+            <div class="mt-2">
+                <a href="{{ k.fatura_dosya.url }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fas fa-file-invoice me-1"></i>Fatura</a>
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            <a href="/ihale/{{ k.ihale_id }}/incele/" class="btn btn-sm btn-primary">İhaleyi Aç</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="gecmis-kart">
+        <p class="text-muted mb-0">Bu ürün için başka kayıt bulunamadı.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

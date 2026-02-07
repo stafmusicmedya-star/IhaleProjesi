@@ -1,0 +1,26 @@
+Django>=4.2,<6
+python-dotenv>=1.0
+
+# PDF
+pdfplumber>=0.10
+PyMuPDF>=1.24
+pdf2image>=1.17
+
+# Excel
+openpyxl>=3.1
+pandas>=2.0
+
+# Word
+python-docx>=1.0
+
+# Resim ve OCR
+Pillow>=10.0
+pytesseract>=0.3
+
+# Dosyayı görüntü (image) gibi analiz: PDF/Excel/Word → görüntü + tablo
+img2table>=1.2
+
+# API entegrasyonu (görüntü analizi için)
+openai>=1.0
+anthropic>=0.39
+google-generativeai>=0.8

@@ -1,0 +1,311 @@
+================================================================================
+   ÇOK DETAYLI KURULUM REHBERİ – HİÇ BİR ŞEY BİLMİYORSANIZ BUNU TAKİP EDİN
+   (Excel, PDF, Word dosyalarını görüntü gibi analiz etmek için)
+================================================================================
+
+Bu rehberde her adım, "nerede tıklayacaksınız" ve "ne yazacaksınız" diye
+anlatılmıştır. Sırayla gidin; bir adımı atlamayın.
+
+================================================================================
+BÖLÜM A: BİLGİSAYARINIZ 64 BİT Mİ ÖĞRENME
+================================================================================
+
+Poppler indirirken 64 bit sürümü seçeceğiz. Önce bunu anlayalım.
+
+A.1) Klavyeden Windows tuşuna basın (genelde space’in solundaki tuş).
+     Veya ekranın sol alt köşesindeki Windows (pencere) simgesine tıklayın.
+
+A.2) Açılan menüde veya arama kutusuna şunu yazın:
+     sistem
+
+A.3) "Sistem" veya "Sistem bilgisi" yazan seçeneğe tıklayın.
+     Bir pencere açılacak.
+
+A.4) Açılan pencerede "Cihaz özellikleri" veya "Sistem" bölümüne bakın.
+     "Sistem türü" veya "Sistem türü:" satırını bulun.
+     Yanında şunlardan biri yazar:
+       - "64 bit işletim sistemi, x64 tabanlı işlemci"  → 64 bit
+       - "32 bit işletim sistemi"                      → 32 bit
+
+A.5) 64 bit yazıyorsa aşağıda "64" geçen dosyayı indireceksiniz.
+     32 bit yazıyorsa "32" geçen dosyayı indireceksiniz.
+     (Çoğu bilgisayar 64 bittir.)
+
+================================================================================
+BÖLÜM B: POPPLER İNDİRME VE AÇMA (PDF’LERİ RESME ÇEVİREN PROGRAM)
+================================================================================
+
+B.1) İnternet tarayıcınızı açın (Chrome, Edge, Firefox fark etmez).
+
+B.2) En üstte adres çubuğuna (URL yazılan yere) tıklayın ve şunu aynen yazın:
+     https://github.com/oschwartz10612/poppler-windows/releases
+     Sonra Enter’a basın.
+
+B.3) GitHub adlı bir site açılacak. Sayfada "Releases" veya "Sürümler" gibi
+     bir bölüm ve aşağıda sürüm numaraları (örn. 24.08.0) görünecek.
+
+B.4) En üstteki sürümün altında "Assets" yazısını görün.
+     "Assets" kelimesine tıklayın. (Bazen zaten açıktır, bir şey değişmeyebilir.)
+
+B.5) Açılan listede birkaç dosya adı var. Şunlara dikkat edin:
+     - Bilgisayarınız 64 bit ise:  "poppler-24.08.0_x64.zip" gibi
+       "x64" veya "64" geçen zip dosyasını bulun.
+     - 32 bit ise: "x86" veya "32" geçen zip dosyasını bulun.
+
+B.6) Doğru zip dosyasının yanındaki dosya adına tıklayın.
+     İndirme başlayacak. İndirilenler klasörünüze (genelde
+     C:\Users\SizinKullaniciAdiniz\Downloads) kaydedilir.
+
+B.7) İndirme bitene kadar bekleyin. İndirilenler klasörünüzde
+     "poppler-24.08.0_x64.zip" gibi bir dosya göreceksiniz.
+     (Sürüm numarası farklı olabilir, sorun değil.)
+
+B.8) Bu zip dosyasına SAĞ tıklayın. Açılan menüden
+     "Tümünü çıkart..." veya "Extract All..." seçeneğine tıklayın.
+
+B.9) Açılan pencerede "Çıkartılacak konum" veya "Extract to" yazan yere
+     şunu yazın (C: sürücüsü ve Program Files klasörüne çıkartacağız):
+     C:\Program Files
+     Not: "Program Files" yoksa önce C:\ yazıp Enter’a basın, sonra
+     "Program Files" klasörünü açıp aynı pencerede "Çıkart" deyin.
+     Veya "Gözat" ile C:\Program Files seçin.
+
+B.10) "Çıkart" veya "Extract" butonuna tıklayın. Birkaç saniye sonra
+      C:\Program Files içinde "poppler-24.08.0" gibi bir klasör oluşur.
+      İçinde "Library" klasörü, onun içinde de "bin" klasörü vardır.
+      Tam yol örneği: C:\Program Files\poppler-24.08.0\Library\bin
+      (Sürüm numaranız farklıysa poppler-24.08.0 yerine poppler-XX.XX.X yazar.)
+
+B.11) Bu tam yolu bir yere not edin. Sonraki adımda PATH’e eklerken
+      kullanacağız. Örnek: C:\Program Files\poppler-24.08.0\Library\bin
+
+================================================================================
+BÖLÜM C: POPPLER’I WINDOWS PATH’E EKLEME (ÇOK ÖNEMLİ)
+================================================================================
+
+Windows’un "pdftoppm" komutunu bulabilmesi için Poppler’ın "bin" klasörünü
+sisteme tanıtmamız gerekiyor. Buna "PATH’e ekleme" denir.
+
+C.1) Klavyeden Windows tuşuna basın. Arama kutusuna şunu yazın:
+     ortam değişkenleri
+
+C.2) "Sistem ortam değişkenlerini düzenle" veya
+     "Ortam değişkenlerini düzenle" yazan seçeneğe tıklayın.
+     (Bazen "Sistem için ortam değişkenlerini düzenle" de olabilir.)
+
+C.3) Küçük bir pencere açılır. Altta "Ortam Değişkenleri..." veya
+     "Environment Variables..." butonu vardır. Ona tıklayın.
+
+C.4) Yeni açılan pencerede iki kutu var:
+     - Üst kutu: "Kullanıcı değişkenleri" (User variables)
+     - Alt kutu: "Sistem değişkenleri" (System variables)
+     ALT KUTUYA bakın. "Sistem değişkenleri" listesinde "Path" veya "PATH"
+     satırını bulun. Bir kere tıklayıp seçin.
+
+C.5) Alt kutunun hemen altındaki "Düzenle..." veya "Edit..." butonuna tıklayın.
+
+C.6) Başka bir pencere açılır. "Yeni" veya "New" butonuna tıklayın.
+     Listeye yeni boş bir satır eklenir.
+
+C.7) O yeni satıre tıklayıp B.11’de not ettiğiniz yolu AYNEN yapıştırın.
+     Örnek: C:\Program Files\poppler-24.08.0\Library\bin
+     (Kendi sürüm numaranıza göre poppler-24.08.0 kısmını düzeltin.)
+
+C.8) "Tamam" veya "OK" butonuna tıklayın. Açılan tüm pencerelerde
+      sırayla "Tamam" deyip kapatın.
+
+C.9) ÖNEMLİ: PATH değişikliği yeni açılacak pencerelerde geçerli olur.
+      Eğer CMD veya PowerShell zaten açıksa onu KAPATIN. Sonraki adımda
+      yeniden açacağız.
+
+================================================================================
+BÖLÜM D: POPPLER KURULUMUNU KONTROL ETME
+================================================================================
+
+D.1) Windows tuşuna basın, arama kutusuna şunu yazın:
+     cmd
+
+D.2) "Komut İstemi" veya "Command Prompt" çıktığında ona tıklayın.
+     Siyah veya beyaz bir pencere açılır; içinde bir yol ve
+     "C:\Users\...>" gibi bir yazı vardır.
+
+D.3) Bu pencerede şunu AYNEN yazın (küçük harf, tire var):
+     pdftoppm -h
+
+D.4) Enter’a basın.
+
+D.5) Sonuç:
+     - Eğer bir sürü satır İngilizce yazı (Usage, Options vs.) çıkıyorsa
+       Poppler doğru kurulmuştur. Bir sonraki bölüme geçin.
+     - "pdftoppm tanınmıyor" veya "is not recognized" gibi bir hata
+       görürseniz Bölüm C’yi tekrar yapın; yolu doğru yazdığınızdan ve
+       tüm pencereleri "Tamam" ile kapattığınızdan emin olun. Sonra
+       bilgisayarı yeniden başlatıp D.1–D.5’i tekrarlayın.
+
+================================================================================
+BÖLÜM E: PROJE KLASÖRÜNÜ BULMA VE AÇMA
+================================================================================
+
+E.1) Projeniz şu klasördedir (kullanıcı adınız farklı olabilir):
+     C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi
+
+E.2) Bunu açmanın en kolay yolu:
+     - Dosya Gezgini’ni açın (Windows tuşu + E veya masaüstündeki klasör simgesi).
+     - Sol taraftan "Bu bilgisayar" veya "Bilgisayar"a tıklayın.
+     - "Yerel disk (C:)" veya "C:" sürücüsüne çift tıklayın.
+     - "Users" klasörüne çift tıklayın.
+     - "kabas" klasörüne çift tıklayın.
+     - "OneDrive" klasörüne çift tıklayın.
+     - "Masaüstü" klasörüne çift tıklayın.
+     - "proje meysa" klasörüne çift tıklayın.
+     - "IhaleProjesi" klasörüne çift tıklayın.
+
+E.3) IhaleProjesi klasörü açıldığında içinde şunları görmelisiniz:
+     - manage.py
+     - requirements.txt
+     - venv (klasör)
+     - ihale_sistemi (klasör)
+     - ihaleler (klasör)
+     vb.
+
+E.4) Üstteki adres çubuğuna (klasör yolunun yazılı olduğu yere) tıklayın.
+     Tam yol seçilir. Ctrl+C ile kopyalayın. Örnek:
+     C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi
+     Bu yolu bir yere not edin; komut penceresinde kullanacağız.
+
+================================================================================
+BÖLÜM F: KOMUT İSTEMİNDE PROJE KLASÖRÜNE GİTME
+================================================================================
+
+F.1) Windows tuşuna basın, arama kutusuna "cmd" yazın ve
+     "Komut İstemi"ni açın (Bölüm D’deki gibi).
+
+F.2) Pencerede şunu yazın (d harfi iki nokta üst üste ve boşluk var):
+     cd /d C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi
+
+     POWERSHELL kullanıyorsanız (PS ile başlayan pencere): cd /d KULLANMAYIN.
+     Bunun yerine şunu yazın (yol tırnak içinde): cd "C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi"
+
+     Not: Eğer projeniz farklı bir diskte veya farklı kullanıcı adındaysa
+     E.4’te kopyaladığınız yolu burada kullanın. cd /d ile başlayın, sonra
+     bir boşluk, sonra yol.
+
+F.3) Enter’a basın. Bir sonraki satırda yolun sonunda
+     ...\IhaleProjesi>  yazıyorsa doğru klasördesiniz demektir.
+
+================================================================================
+BÖLÜM G: SANAL ORTAMI (VENV) AÇMA
+================================================================================
+
+G.1) Hâlâ aynı Komut İstemi penceresinde, şunu AYNEN yazın:
+     venv\Scripts\activate
+
+G.2) Enter’a basın.
+
+G.3) Satırın en başında (venv) yazısı çıkmalı. Örnek:
+     (venv) C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi>
+
+     (venv) görüyorsanız sanal ortam açılmıştır.
+
+G.4) "venv tanınmıyor" veya "cannot find" gibi hata alırsanız:
+     - F.2’deki cd komutunu tekrar yazıp IhaleProjesi klasöründe olduğunuzdan
+       emin olun.
+     - IhaleProjesi içinde "venv" adlı bir klasör var mı kontrol edin.
+       Yoksa daha önce "kurulum_ve_migrate.bat" çalıştırılmamış demektir;
+       o dosyaya çift tıklayıp önce onu çalıştırın, sonra G.1’e dönün.
+
+================================================================================
+BÖLÜM H: PYTHON PAKETLERİNİ KURMA (requirements.txt)
+================================================================================
+
+H.1) Sanal ortam açıkken (yani (venv) yazısı varken) şunu AYNEN yazın:
+     pip install -r requirements.txt
+
+H.2) Enter’a basın. İnternetten paketler indirilip kurulacak.
+     "Successfully installed ..." gibi satırlar görürseniz kurulum tamamdır.
+
+H.3) Olası hatalar:
+     - "pdftoppm" veya "poppler" ile ilgili hata: Bölüm B ve C’yi
+       tekrarlayın; Poppler’ı kurup PATH’e ekleyin, CMD’yi kapatıp
+       yeniden açın, E–G adımlarından tekrar başlayın.
+     - "No module named django" veya benzeri: Önce G.1’deki
+       venv\Scripts\activate komutunu çalıştırdığınızdan emin olun,
+       sonra H.1’i tekrarlayın.
+     - "Access is denied" veya "Erişim reddedildi": Komut İstemi’ni
+       "Yönetici olarak çalıştır" ile açmayı deneyin (CMD’ye sağ tık
+       → Yönetici olarak çalıştır), sonra F–G–H’yi tekrarlayın.
+
+================================================================================
+BÖLÜM I: API ANAHTARI (.env DOSYASI) – İSTEĞE BAĞLI
+================================================================================
+
+OpenAI veya Claude ile görüntü analizi yapacaksanız API anahtarı gerekir.
+Şimdilik sadece kurulum yapıyorsanız bu bölümü atlayabilirsiniz.
+
+I.1) IhaleProjesi klasörünü Dosya Gezgini’nde açın (Bölüm E gibi).
+
+I.2) Boş bir yere sağ tıklayın → "Yeni" → "Metin Belgesi" seçin.
+     "Yeni Metin Belgesi.txt" adında bir dosya oluşur.
+
+I.3) Dosya adını tamamen silin ve şunu yazın:
+     .env
+     (Nokta, env; arada boşluk yok. Uzantı .txt olmamalı.)
+
+I.4) Enter’a basın. Windows "Dosya adı değiştiğinde uzantı değişebilir"
+      uyarısı verirse "Evet" veya "Evet" deyin.
+
+I.5) .env dosyasına çift tıklayın. Hangi programla açılacağı sorulursa
+     "Not Defteri" veya "Notepad" seçin.
+
+I.6) İçine (OpenAI kullanacaksanız) şu satırı yazın:
+     OPENAI_API_KEY=buraya-gercek-anahtarinizi-yapistirin
+
+     Claude kullanacaksanız:
+     ANTHROPIC_API_KEY=buraya-gercek-anahtarinizi-yapistirin
+
+     Anahtarı OpenAI veya Anthropic web sitesinden alırsınız;
+     x’leri silip kendi anahtarınızı yapıştırın.
+
+I.7) Dosya → Farklı Kaydet (veya Ctrl+S) ile kaydedin. .env dosyası
+     IhaleProjesi klasöründe, manage.py ile aynı yerde olmalı.
+
+================================================================================
+ÖZET – HANGİ BÖLÜM NE YAPIYOR?
+================================================================================
+
+A: 64 bit mi öğreniyorsunuz (indirme için).
+B: Poppler indirip zip’ten çıkartıyorsunuz.
+C: Poppler’ı Windows PATH’e ekliyorsunuz.
+D: Poppler’ın çalıştığını kontrol ediyorsunuz.
+E: Proje klasörünü buluyorsunuz.
+F: Komut satırında proje klasörüne gidiyorsunuz.
+G: Sanal ortamı (venv) açıyorsunuz.
+H: pip install -r requirements.txt ile paketleri kuruyorsunuz.
+I: (İsteğe bağlı) .env ile API anahtarı ekliyorsunuz.
+
+================================================================================
+TEKRAR KURULUM (DAHA SONRA SADECE PAKET KURMAK İSTERSENİZ)
+================================================================================
+
+Sadece "paketleri tekrar kur" diyorsanız:
+
+  CMD (Komut İstemi) kullanıyorsanız:
+  1) Windows + R → "cmd" → Enter.
+  2) cd /d C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi
+  3) venv\Scripts\activate
+  4) pip install -r requirements.txt
+
+  PowerShell kullanıyorsanız:
+  1) Windows + R → "powershell" → Enter.
+  2) cd "C:\Users\kabas\OneDrive\Masaüstü\proje meysa\IhaleProjesi"
+  3) .\venv\Scripts\Activate.ps1
+  4) pip install -r requirements.txt
+
+(Projeniz farklı yerdeyse 2. adımdaki yolu kendi yolunuzla değiştirin.)
+
+================================================================================
+SON
+================================================================================
+
+Takıldığınız adımın numarasını ve ekranda gördüğünüz tam hata mesajını
+(kopyalayıp) yazarsanız, o adıma özel yardım edebiliriz.

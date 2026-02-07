@@ -7,16 +7,22 @@
     <title>MEYSA TEKNİK | İhaleler</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; --ekap-green: #28a745; }
-        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; --ekap-green: #28a745; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif; color: var(--text-primary); }
         
         /* NAVBAR */
-        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
-        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
-        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid var(--border-mid); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
         .nav-capsule a:hover { color: var(--ekap-blue); }
         .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+        .nav-user-block { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 14px; border-radius: 50px; border: 1px solid #e9ecef; }
+        .nav-user-block .nav-username { font-size: 13px; font-weight: 600; color: var(--ekap-blue); text-transform: uppercase; letter-spacing: 0.3px; }
+        .nav-user-block .btn-logout { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
 
         /* ÖZEL VURGULU DOSYA YÜKLEME BUTONU */
         .nav-upload-btn { 
@@ -53,8 +59,22 @@
             font-size: 12px; color: #777; display: flex; justify-content: space-between; align-items: center;
         }
 
-        .btn-delete-ihale { color: #dc3545; transition: 0.3s; padding: 5px 10px; border-radius: 5px; text-decoration: none; }
+        .btn-delete-ihale { color: #dc3545; transition: 0.3s; padding: 6px 12px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; }
         .btn-delete-ihale:hover { background: #fff5f5; color: #a71d2a; }
+
+        /* İhale sağ blok: sil + İKN kutusu (tek satırda hizalı) */
+        .ihale-sag-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .ihale-sag-meta .btn-delete-ihale { flex-shrink: 0; padding: 6px 10px; }
+        .ihale-no-tarih { text-align: right; padding: 8px 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; min-width: 90px; }
+        .ihale-no-tarih .fw-bold { font-size: 1rem; display: block; }
+        .ihale-no-tarih .small { display: block; margin-top: 2px; }
+        .ihale-durum-notu { margin-left: 1.25rem; margin-top: 8px; }
+
+        /* Kalem tablo: Görsel / Şartname butonları büyük */
+        .btn-kalem-gorsel, .btn-kalem-sartname { padding: 6px 10px; font-size: 14px; min-width: 36px; }
+        .kalem-tablo th.text-center, .kalem-tablo td.text-center { vertical-align: middle; }
+        .kalem-tablo .kalem-birim-fiyat { text-align: center; }
+        .kalem-tablo tfoot .toplam-tutar-cell { text-align: center; }
 
         /* DOSYA BUTONLARI */
         .file-link-btn {
@@ -88,6 +108,19 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Misafir: veriler blurlu + giriş overlay */
+        .portal-container { position: relative; }
+        .guest-blur-inner { display: flex; flex: 1; gap: 25px; min-height: 400px; }
+        .guest-blur-inner.blurred { filter: blur(10px); pointer-events: none; user-select: none; }
+        .guest-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.82); z-index: 8; }
+        .guest-overlay .inner { text-align: center; padding: 2rem; }
+        .guest-overlay .btn { padding: 12px 28px; font-weight: 700; border-radius: 10px; }
+
+        .teklif-panel { position: fixed; top: 0; right: 0; width: 320px; max-width: 100%; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.1); z-index: 1050; transition: transform 0.3s ease; transform: translateX(100%); overflow-y: auto; }
+        .teklif-panel.acik { transform: translateX(0); }
+        .teklif-panel .panel-icerik { padding: 20px; }
+        .teklif-panel .kapat { position: absolute; top: 12px; right: 12px; }
     </style>
 </head>
 <body>
@@ -102,35 +135,36 @@
     </div>
 
     <nav class="ekap-navbar">
-        <a href="{% url 'ana_sayfa' %}">
-            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    <a href="{% url 'ana_sayfa' %}">
+        <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    </a>
+
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+
+        <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+            <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
         </a>
-        <div class="nav-capsule">
-            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
-            <a href="{% url 'ihale_listesi' %}" class="active">İhaleler</a>
-            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
-            
-            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
-                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
-            </a>
-            
-            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
-            
-            <div style="width:1px; height:20px; background:#ddd;"></div>
-            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
-            <a href="{% url 'mesailerim_sayfasi' %}">Mesailerim</a>
-            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="fw-bold text-uppercase" style="font-size: 11px; color: var(--ekap-blue);">{{ user.username }}</span>
-            <form action="/admin/logout/" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
-            </form>
-        </div>
-    </nav>
+
+        <a href="{% url 'arabalar' %}">Arabalar</a>
+
+        <div style="width:1px; height:20px; background:#ddd;"></div>
+        <a href="{% url 'analiz' %}" class="active">Analiz</a>
+        <a href="{% url 'mesailerim' %}">Mesailerim</a>
+        <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+    </div>
+
+    <div class="nav-user-block">
+        <span class="nav-username">{{ user.username }}</span>
+        <form action="/admin/logout/" method="post" style="display:inline; margin:0;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger btn-logout">Çıkış</button></form>
+    </div>
+</nav>
 
     <div class="portal-container">
+        <div class="guest-blur-inner {% if blur_content %}blurred{% endif %}">
         <aside class="filter-panel">
             <form method="GET" id="filterForm">
                 <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="fas fa-filter me-2"></i>Detaylı Filtre</h6>
@@ -148,7 +182,7 @@
                     <select name="tur" class="form-select form-select-sm">
                         <option value="">Tümü</option>
                         <option value="Mal" {% if request.GET.tur == 'Mal' %}selected{% endif %}>Mal Alımı</option>
-                        <option value="Yapim" {% if request.GET.tur == 'Yapim' %}selected{% endif %}>Yapım İşi</option>
+                        <option value="Yapım" {% if request.GET.tur == 'Yapım' %}selected{% endif %}>Yapım İşi</option>
                         <option value="Hizmet" {% if request.GET.tur == 'Hizmet' %}selected{% endif %}>Hizmet Alımı</option>
                     </select>
                 </div>
@@ -157,11 +191,13 @@
                     <label class="small fw-bold">İl</label>
                     <select name="il" id="ilSelect" class="form-select form-select-sm" onchange="ilceGuncelle()">
                         <option value="">İl Seçiniz</option>
-                        <option value="Istanbul" {% if request.GET.il == 'Istanbul' %}selected{% endif %}>İSTANBUL</option>
-                        <option value="Ankara" {% if request.GET.il == 'Ankara' %}selected{% endif %}>ANKARA</option>
-                        <option value="Izmir" {% if request.GET.il == 'Izmir' %}selected{% endif %}>İZMİR</option>
-                        <option value="Bursa" {% if request.GET.il == 'Bursa' %}selected{% endif %}>BURSA</option>
-                        <option value="Antalya" {% if request.GET.il == 'Antalya' %}selected{% endif %}>ANTALYA</option>
+                        <option value="İstanbul" {% if request.GET.il == 'İstanbul' %}selected{% endif %}>İstanbul</option>
+                        <option value="Ankara" {% if request.GET.il == 'Ankara' %}selected{% endif %}>Ankara</option>
+                        <option value="İzmir" {% if request.GET.il == 'İzmir' %}selected{% endif %}>İzmir</option>
+                        <option value="Bursa" {% if request.GET.il == 'Bursa' %}selected{% endif %}>Bursa</option>
+                        <option value="Antalya" {% if request.GET.il == 'Antalya' %}selected{% endif %}>Antalya</option>
+                        <option value="Adana" {% if request.GET.il == 'Adana' %}selected{% endif %}>Adana</option>
+                        <option value="Kocaeli" {% if request.GET.il == 'Kocaeli' %}selected{% endif %}>Kocaeli</option>
                     </select>
                 </div>
 
@@ -223,40 +259,40 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="w-100">
                         <div class="d-flex align-items-center mb-2 gap-2">
-                            <span class="badge bg-primary text-uppercase">{{ ihale.get_tur_display|default:ihale.tur }}</span>
-                            <span class="badge badge-acik"><i class="fas fa-check-circle me-1"></i>AÇIK</span>
-
+                            <span class="badge bg-primary text-uppercase"><i class="fas {% if ihale.tur == 'Hizmet' %}fa-tools{% elif ihale.tur == 'Yapım' %}fa-hard-hat{% else %}fa-box{% endif %} me-1"></i>{{ ihale.get_tur_display|default:ihale.tur }}</span>
+                            <span class="badge {% if ihale.durum == 'Acik' %}bg-success{% else %}bg-secondary{% endif %} text-uppercase small">{% if ihale.durum == 'Acik' %}Açık{% else %}Kapalı{% endif %}</span>
                             {% if ihale.cetvel_dosya %}
                             <a href="{{ ihale.cetvel_dosya.url }}" target="_blank" class="btn btn-outline-primary file-link-btn">
                                 <i class="fas fa-file-excel"></i> Cetvel
                             </a>
                             {% endif %}
                             {% if ihale.sartname_dosya %}
-                            <a href="{{ ihale.sartname_dosya.url }}" target="_blank" class="btn btn-outline-danger file-link-btn">
+                            <a href="{{ ihale.sartname_dosya.url }}" target="_blank" class="btn btn-outline-danger file-link-btn" title="Teknik Şartname (PDF)">
                                 <i class="fas fa-file-pdf"></i> Şartname
                             </a>
                             {% endif %}
+                            {% if ihale.verilen_teklif_dosya %}
+                            <a href="{{ ihale.verilen_teklif_dosya.url }}" target="_blank" class="btn btn-outline-secondary file-link-btn"><i class="fas fa-file-signature"></i> Verilen Teklif</a>
+                            {% else %}
+                            <button type="button" class="btn btn-outline-secondary file-link-btn" data-ihale-id="{{ ihale.pk }}" onclick="acTeklifPanel({{ ihale.pk }})"><i class="fas fa-file-signature"></i> Verilen Teklif (Yükle)</button>
+                            {% endif %}
                         </div>
-                        
-                        <a class="ihale-main-link" onclick="toggleKalemler('box-{{ ihale.id }}')">{{ ihale.ihale_adi }}</a>
-                        <div class="small text-muted mb-1"><i class="fas fa-hospital me-1"></i> {{ ihale.hastane.ad }} | <b>{{ ihale.il }}</b></div>
-                        
-                        <div class="ihale-durum-notu">
-                            <i class="fas fa-info-circle me-1 text-primary"></i> 
-                            <b>Durum:</b> {{ ihale.is_durumu|default:"İhale süreci devam ediyor, teklif hazırlığı aşamasında." }}
-                        </div>
+                        <span class="d-flex align-items-center gap-2 flex-wrap">
+                            <a href="/ihale/{{ ihale.pk }}/incele/" class="ihale-main-link mb-0">{{ ihale.ihale_adi }}</a>
+                            <a href="/ihale/{{ ihale.pk }}/incele/" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:0.75rem;" title="Tam sayfa incele">İncele</a>
+                        </span>
+                        <div class="small text-muted mb-0 mt-1"><i class="fas fa-hospital me-1"></i> {{ ihale.hastane.ad }} | <b>{{ ihale.il }}</b> <span class="text-dark ms-1">· <i class="fas fa-info-circle me-1 text-primary"></i><b>Durum:</b> {{ ihale.is_durumu|default:"İhale süreci devam ediyor, teklif hazırlığı aşamasında." }}</span></div>
                     </div>
-                    
-                    <div class="text-end d-flex align-items-start gap-3">
-                        <div>
-                            <div class="fw-bold text-primary">{{ ihale.ihale_no }}</div>
-                            <div class="small text-muted"><i class="far fa-calendar-alt me-1"></i> {{ ihale.tarih|date:"d.m.Y" }}</div>
-                        </div>
+                    <div class="ihale-sag-meta" title="İhale Kayıt No (İKN)">
                         <a href="{% url 'ihale_sil' ihale.pk %}" 
                            onclick="return confirm('Bu ihaleyi silmek istediğinize emin misiniz?')" 
-                           class="btn-delete-ihale" title="Sil">
+                           class="btn-delete-ihale" title="İhaleyi sil">
                             <i class="fas fa-trash-alt"></i>
                         </a>
+                        <div class="ihale-no-tarih">
+                            <span class="fw-bold text-primary">{{ ihale.ihale_no }}</span>
+                            <span class="small text-muted d-block mt-1"><i class="far fa-calendar-alt me-1"></i>{{ ihale.tarih|date:"d.m.Y" }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -270,43 +306,6 @@
                         Değiştirilme: <b class="text-dark">{{ ihale.guncellenme_tarihi|date:"d.m.Y H:i" }}</b>
                     </span>
                 </div>
-
-                <div id="box-{{ ihale.id }}" class="kalemler-box">
-                    <form action="{% url 'toplu_fiyat_guncelle' %}" method="POST">
-                        {% csrf_token %}
-                        <table class="table table-sm table-bordered mt-2 shadow-sm">
-                            <thead class="table-light text-secondary">
-                                <tr>
-                                    <th>Ürün Adı</th>
-                                    <th width="100">Miktar</th>
-                                    <th width="150">Birim Fiyat (₺)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for kalem in ihale.kalemler.all %}
-                                <tr>
-                                    <td>{{ kalem.urun_adi }}</td>
-                                    <td>{{ kalem.adet }} {{ kalem.birim }}</td>
-                                    <td>
-                                        <input type="hidden" name="kalem_id[]" value="{{ kalem.id }}">
-                                        <input type="text" name="fiyat[]" class="form-control form-control-sm fw-bold border-primary" 
-                                               value="{{ kalem.birim_fiyat }}" placeholder="0.00">
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="3" class="text-center py-3 text-muted">Kalem verisi bulunmuyor.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% if ihale.kalemler.all %}
-                        <div class="text-end mt-2">
-                            <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold">
-                                <i class="fas fa-check-circle me-1"></i> Fiyatları Kaydet
-                            </button>
-                        </div>
-                        {% endif %}
-                    </form>
-                </div>
             </div>
             {% empty %}
             <div class="alert alert-white border text-center mt-4 shadow-sm">
@@ -314,6 +313,15 @@
             </div>
             {% endfor %}
         </main>
+        </div>
+        {% if blur_content %}
+        <div class="guest-overlay">
+            <div class="inner">
+                <p class="mb-3 text-dark fw-bold"><i class="fas fa-lock me-2"></i>Verileri görmek için giriş yapın.</p>
+                <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary"><i class="fas fa-sign-in-alt me-2"></i>Giriş Yap</a>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -344,6 +352,33 @@
             if(b) b.style.display = (b.style.display === "block") ? "none" : "block";
         }
 
+        function toggleSartname(id) {
+            var el = document.getElementById(id);
+            if(el) el.style.display = (el.style.display === "block") ? "none" : "block";
+        }
+
+        function parseNum(val) { return Math.max(0, parseFloat(String(val).replace(",", ".")) || 0); }
+        function guncelleKalemToplam(satir) {
+            var adet = parseNum(satir.getAttribute("data-adet"));
+            var inp = satir.querySelector(".kalem-birim-fiyat");
+            var toplamCell = satir.querySelector(".kalem-toplam-cell");
+            if(!inp || !toplamCell) return;
+            var bf = parseNum(inp.value);
+            var top = adet * bf;
+            toplamCell.textContent = top.toFixed(2);
+            var tfoot = satir.closest("table") && satir.closest("table").querySelector("tfoot");
+            if(tfoot) {
+                var toplam = 0;
+                satir.closest("tbody").querySelectorAll(".kalem-satir").forEach(function(r){
+                    var a = parseNum(r.getAttribute("data-adet"));
+                    var i = r.querySelector(".kalem-birim-fiyat");
+                    toplam += a * (i ? parseNum(i.value) : 0);
+                });
+                var tc = tfoot.querySelector(".toplam-tutar-cell");
+                if(tc) tc.textContent = toplam.toFixed(2);
+            }
+        }
+
         // --- ASENKRON DOSYA YÜKLEME SİHİRBAZI (İHALELER ÖZEL) ---
         document.addEventListener('DOMContentLoaded', function() {
             // Dosya yükleme linkine tıklandığında veya form gönderildiğinde çalışır
@@ -353,20 +388,56 @@
             
             if (uploadForm) {
                 uploadForm.addEventListener('submit', function() {
-                    document.getElementById('loadingOverlay').style.display = 'flex';
+                    var ov = document.getElementById('loadingOverlay');
+                    if(ov) ov.style.display = 'flex';
                     let progress = 0;
                     const bar = document.getElementById('aiProgressBar');
-                    
-                    const interval = setInterval(() => {
-                        progress += (100 - progress) * 0.1;
-                        bar.style.width = progress + '%';
-                        if(progress > 95) clearInterval(interval);
-                    }, 1000);
+                    if(bar) {
+                        const interval = setInterval(() => {
+                            progress += (100 - progress) * 0.1;
+                            bar.style.width = progress + '%';
+                            if(progress > 95) clearInterval(interval);
+                        }, 1000);
+                    }
                 });
             }
+            // Kalem tabloları: birim fiyat değişince toplam + footer güncelle
+            document.querySelectorAll(".kalem-birim-fiyat").forEach(function(inp) {
+                inp.addEventListener("input", function() { guncelleKalemToplam(inp.closest(".kalem-satir")); });
+                inp.addEventListener("change", function() { guncelleKalemToplam(inp.closest(".kalem-satir")); });
+            });
+            document.querySelectorAll(".kalem-tablo").forEach(function(tbl) {
+                var tbody = tbl.querySelector("tbody");
+                if(!tbody) return;
+                var genelToplam = 0;
+                tbody.querySelectorAll(".kalem-satir").forEach(function(satir) {
+                    guncelleKalemToplam(satir);
+                    var adet = parseNum(satir.getAttribute("data-adet"));
+                    var inp = satir.querySelector(".kalem-birim-fiyat");
+                    genelToplam += adet * (inp ? parseNum(inp.value) : 0);
+                });
+                var tc = tbl.querySelector("tfoot .toplam-tutar-cell");
+                if(tc) tc.textContent = genelToplam.toFixed(2);
+            });
         });
 
+        function acTeklifPanel(ihalePk) {
+            document.getElementById('teklifUploadForm').action = '/ihale/' + ihalePk + '/verilen-teklif-yukle/';
+            document.getElementById('teklifPanel').classList.add('acik');
+        }
         window.onload = ilceGuncelle;
     </script>
+
+    <div id="teklifPanel" class="teklif-panel">
+        <button type="button" class="btn btn-sm btn-outline-secondary kapat" onclick="document.getElementById('teklifPanel').classList.remove('acik');" aria-label="Kapat"><i class="fas fa-times"></i></button>
+        <div class="panel-icerik mt-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-file-signature me-1"></i> Verilen Teklif (ıslak imzalı) Yükle</h6>
+            <form id="teklifUploadForm" method="POST" enctype="multipart/form-data" action="">
+                {% csrf_token %}
+                <input type="file" name="verilen_teklif_dosya" class="form-control form-control-sm mb-2" accept=".pdf,.jpg,.jpeg,.png">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Yükle</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

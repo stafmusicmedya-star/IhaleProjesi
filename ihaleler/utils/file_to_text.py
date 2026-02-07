@@ -5,8 +5,20 @@ import openpyxl
 from PIL import Image
 import pytesseract
 
-# WINDOWS için Tesseract yolu (Linux/Mac'te gerek yok)
-# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# OCR ayarları (Django settings'ten; Django yüklü değilse env/varsayılan)
+def _get_ocr_config():
+    try:
+        from django.conf import settings
+        cmd = getattr(settings, "TESSERACT_CMD", None)
+        lang = getattr(settings, "OCR_LANG", "tur")
+        psm = getattr(settings, "OCR_PSM", "6")
+    except Exception:
+        cmd = os.environ.get("TESSERACT_CMD")
+        lang = os.environ.get("OCR_LANG", "tur")
+        psm = os.environ.get("OCR_PSM", "6")
+    if cmd:
+        pytesseract.pytesseract.tesseract_cmd = cmd
+    return lang, psm
 
 
 def extract_text_from_file(file_path):
@@ -46,8 +58,22 @@ def extract_pdf(path):
 
 
 def extract_docx(path):
+    """Metin + tabloları çıkarır. Birim Fiyat Teklif Cetveli gibi tablolar satır satır (sütunlar TAB ile) döner."""
     doc = docx.Document(path)
-    return "\n".join(p.text for p in doc.paragraphs)
+    parts = []
+    # Önce tabloları al (cetvel genelde tablo formatındadır)
+    for table in doc.tables:
+        for row in table.rows:
+            row_text = "\t".join((cell.text or "").strip().replace("\n", " ") for cell in row.cells)
+            if row_text.strip():
+                parts.append(row_text)
+        if parts:
+            parts.append("")  # tablo sonu
+    # Paragrafları ekle (başlık, açıklama vb.)
+    para_text = "\n".join(p.text.strip() for p in doc.paragraphs if p.text.strip())
+    if para_text:
+        parts.append(para_text)
+    return "\n".join(parts) if parts else ""
 
 
 def extract_excel(path):
@@ -64,9 +90,10 @@ def extract_excel(path):
 
 
 def extract_image(path):
+    lang, psm = _get_ocr_config()
     img = Image.open(path)
     return pytesseract.image_to_string(
         img,
-        lang="tur",
-        config="--psm 6"
+        lang=lang,
+        config=f"--psm {psm}"
     )

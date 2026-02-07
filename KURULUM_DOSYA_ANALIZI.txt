@@ -1,0 +1,115 @@
+================================================================================
+  EXCEL, PDF VE WORD DOSYALARINI GÖRÜNTÜ GİBİ ANALİZ ETME – KURULUM ADIMLARI
+  (pdf2image, img2table, OpenAI/Claude API)
+================================================================================
+
+Bu rehber, hiç kod bilgisi olmadan adım adım kurulum içindir.
+Sırayla yapın; bir adım hata verirse o adımı tekrar kontrol edin.
+
+--------------------------------------------------------------------------------
+ADIM 1: Poppler kurulumu (sadece Windows – PDF’leri görüntüye çevirmek için)
+--------------------------------------------------------------------------------
+
+pdf2image kütüphanesi PDF sayfalarını resme çevirir. Bunun için bilgisayarınızda
+“Poppler” programının kurulu olması gerekir.
+
+1.1) Tarayıcıda şu adresi açın:
+     https://github.com/oschwartz10612/poppler-windows/releases
+
+1.2) En üstteki sürümün altında “Assets” bölümünü açın.
+
+1.3) Bilgisayarınız 64 bit ise:
+        poppler-xx.xx.x_x64.zip
+     dosyasını indirin (xx.xx.x sürüm numarasıdır).
+
+1.4) İndirdiğiniz zip dosyasını bir klasöre çıkartın.
+     Örnek: C:\Program Files\poppler-24.08.0\
+     İçinde “bin” adında bir klasör göreceksiniz.
+
+1.5) Windows’ta “bin” klasörünü PATH’e ekleyin:
+     - Windows arama çubuğuna “ortam değişkenleri” yazın.
+     - “Sistem ortam değişkenlerini düzenle”ni açın.
+     - “Ortam Değişkenleri” butonuna tıklayın.
+     - “Sistem değişkenleri”nde “Path”i seçip “Düzenle” deyin.
+     - “Yeni” deyip şu yolu ekleyin (kendi klasör yolunuza göre değiştirin):
+       C:\Program Files\poppler-24.08.0\Library\bin
+       veya zip’i nereye çıkarttıysanız: ...\poppler-xxx\Library\bin
+     - Tamam deyip tüm pencereleri kapatın.
+
+1.6) Yeni bir CMD veya PowerShell penceresi açıp şunu yazın:
+     pdftoppm -h
+     Bir sürü satır yazı çıkıyorsa Poppler kurulmuş demektir.
+
+--------------------------------------------------------------------------------
+ADIM 2: Python paketlerini kurun (requirements.txt)
+--------------------------------------------------------------------------------
+
+2.1) Proje klasörüne gidin:
+     C:\Users\...\OneDrive\Masaüstü\proje meysa\IhaleProjesi
+
+2.2) Sanal ortamı açın (zaten kullanıyorsanız bu satırı çalıştırın):
+     venv\Scripts\activate
+     (Başta (venv) yazısı görünür.)
+
+2.3) Tüm paketleri kurun:
+     pip install -r requirements.txt
+
+     Bu komut şunları da kurar:
+     - pdf2image   (PDF → görüntü)
+     - img2table   (görüntü/PDF’ten tablo çıkarma)
+     - openai      (OpenAI API)
+     - anthropic   (Claude API)
+
+2.4) Hata alırsanız:
+     - “pdftoppm” bulunamıyor: Poppler’ı (Adım 1) doğru kurduğunuzdan ve
+       “bin” klasörünü PATH’e eklediğinizden emin olun.
+     - “No module named django”: Önce venv\Scripts\activate ile sanal ortamı
+       açın, sonra tekrar pip install -r requirements.txt yapın.
+
+--------------------------------------------------------------------------------
+ADIM 3: API anahtarlarınızı ayarlayın (.env)
+--------------------------------------------------------------------------------
+
+OpenAI veya Claude ile görüntü analizi yapacaksanız API anahtarı gerekir.
+
+3.1) Proje klasöründe “.env” dosyası var mı bakın. Yoksa “.env” adında yeni bir
+     metin dosyası oluşturun (Not Defteri ile; uzantısı .env olsun).
+
+3.2) İçine aşağıdaki satırlardan kullanacaklarınızı ekleyin:
+
+     OpenAI kullanacaksanız:
+     OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxx
+
+     Claude (Anthropic) kullanacaksanız:
+     ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxx
+
+     (Gerçek anahtarlarınızı x’lerin yerine yazın. Anahtarı OpenAI veya
+      Anthropic web sitesinden alırsınız.)
+
+3.3) Dosyayı kaydedin. .env dosyası proje klasöründe (manage.py ile aynı yerde)
+     olmalı.
+
+--------------------------------------------------------------------------------
+ÖZET – NE KURULDU?
+--------------------------------------------------------------------------------
+
+- pdf2image   : PDF sayfalarını görüntü (image) yapmak için (Poppler gerekli).
+- img2table   : Görüntü veya PDF’ten tablo çıkarmak için.
+- openai      : OpenAI API (görüntü analizi vb.) için.
+- anthropic   : Claude API (görüntü analizi vb.) için.
+
+Excel ve Word dosyalarını da “görüntü gibi” analiz etmek için önce onları
+görüntüye veya PDF’e çeviren ek kodlar yazılır; bu rehber sadece gerekli
+kütüphanelerin ve Poppler’ın kurulumu içindir.
+
+--------------------------------------------------------------------------------
+SONRAKİ ADIM
+--------------------------------------------------------------------------------
+
+Kurulum bittikten sonra projede “dosyayı görüntüye çevirip” analiz eden
+fonksiyonlar eklenebilir. İsterseniz “Excel/Word’ü önce PDF’e çevir, sonra
+pdf2image ile görüntü yap” veya “doğrudan img2table ile tablo çıkar” gibi
+akışlar kod tarafında adım adım yazılır.
+
+Sorun olursa hangi adımda, tam olarak ne hata yazıyor (kopyalayıp) iletirseniz
+ona göre devam edebiliriz.

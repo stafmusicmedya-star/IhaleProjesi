@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | {% if filtre_tur %}{{ filtre_tur }}{% elif filtre_durum %}Açık Dosyalar{% else %}Liste{% endif %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; --ekap-green: #28a745; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Source Sans 3', system-ui, sans-serif; color: var(--text-primary); }
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid var(--border-mid); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .nav-capsule a:hover { color: var(--ekap-blue); }
+        .portal-container { padding: 25px 40px; max-width: 1200px; margin: 0 auto; }
+        .section-title { font-size: 1rem; font-weight: 700; color: var(--ekap-blue); margin-bottom: 12px; }
+        .ihale-card { background: white; border-radius: 12px; border: 1px solid #e0e6ed; padding: 20px; margin-bottom: 12px; border-left: 5px solid var(--ekap-blue); }
+        .ihale-card.dt { border-left-color: var(--ekap-green); }
+        .ihale-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .ihale-main-link { color: #212529; font-weight: 700; text-decoration: none; }
+        .ihale-main-link:hover { color: var(--ekap-blue); }
+        .ihale-footer-info { margin-top: 12px; padding-top: 10px; border-top: 1px solid #f0f0f0; font-size: 12px; color: #777; display: flex; justify-content: space-between; }
+        .ihale-sag-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .ihale-no-tarih { text-align: right; padding: 8px 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; min-width: 90px; }
+        .btn-delete-ihale { color: #dc3545; text-decoration: none; padding: 6px 10px; border-radius: 6px; }
+        .btn-delete-ihale:hover { background: #fff5f5; color: #a71d2a; }
+        .file-link-btn { font-size: 11px; padding: 2px 8px; border-radius: 4px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="ekap-navbar">
+        <a href="{% url 'ana_sayfa' %}"><img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;"></a>
+        <div class="nav-capsule">
+            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+            <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+            <a href="{% url 'dosya_yukleme' %}" style="background: var(--ekap-blue); color: white !important; padding: 6px 15px; border-radius: 20px; font-weight: 700;">Dosya Yükleme</a>
+            <a href="{% url 'arabalar' %}">Arabalar</a>
+            <a href="{% url 'analiz' %}">Analiz</a>
+            <a href="{% url 'profilim' %}">Profilim</a>
+            <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+        </div>
+        <a href="{% url 'ana_sayfa' %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-arrow-left me-1"></i> Anasayfa</a>
+    </nav>
+
+    <div class="portal-container">
+        <p class="text-muted mb-4">
+            {% if filtre_tur %}<strong>{{ filtre_tur }}</strong> türünde ihaleler ve doğrudan teminler.{% endif %}
+            {% if filtre_durum %}<strong>Açık</strong> ihaleler ve doğrudan teminler.{% endif %}
+        </p>
+
+        <h6 class="section-title"><i class="fas fa-gavel me-2"></i>İhaleler ({{ ihaleler|length }})</h6>
+        {% for ihale in ihaleler %}
+        <div class="ihale-card">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="w-100">
+                    <div class="d-flex align-items-center mb-2 gap-2">
+                        <span class="badge bg-primary text-uppercase"><i class="fas {% if ihale.tur == 'Hizmet' %}fa-tools{% elif ihale.tur == 'Yapım' %}fa-hard-hat{% else %}fa-box{% endif %} me-1"></i>{{ ihale.get_tur_display|default:ihale.tur }}</span>
+                        <span class="badge {% if ihale.durum == 'Acik' %}bg-success{% else %}bg-secondary{% endif %} text-uppercase small">{% if ihale.durum == 'Acik' %}Açık{% else %}Kapalı{% endif %}</span>
+                        {% if ihale.cetvel_dosya %}<a href="{{ ihale.cetvel_dosya.url }}" target="_blank" class="btn btn-outline-primary file-link-btn"><i class="fas fa-file-excel"></i> Cetvel</a>{% endif %}
+                        {% if ihale.sartname_dosya %}<a href="{{ ihale.sartname_dosya.url }}" target="_blank" class="btn btn-outline-danger file-link-btn"><i class="fas fa-file-pdf"></i> Şartname</a>{% endif %}
+                    </div>
+                    <span class="d-flex align-items-center gap-2 flex-wrap">
+                        <a href="/ihale/{{ ihale.pk }}/incele/" class="ihale-main-link mb-0">{{ ihale.ihale_adi }}</a>
+                        <a href="/ihale/{{ ihale.pk }}/incele/" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size:0.75rem;">İncele</a>
+                    </span>
+                    <div class="small text-muted mb-0 mt-1"><i class="fas fa-hospital me-1"></i> {{ ihale.hastane.ad }} | <b>{{ ihale.il }}</b> · <b>Durum:</b> {{ ihale.is_durumu|default:"İhale süreci devam ediyor." }}</div>
+                </div>
+                <div class="ihale-sag-meta">
+                    <a href="{% url 'ihale_sil' ihale.pk %}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="btn-delete-ihale"><i class="fas fa-trash-alt"></i></a>
+                    <div class="ihale-no-tarih">
+                        <span class="fw-bold text-primary">{{ ihale.ihale_no }}</span>
+                        <span class="small text-muted d-block mt-1"><i class="far fa-calendar-alt me-1"></i>{{ ihale.tarih|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ihale-footer-info">
+                <span>Dosyayı Yükleyen: <b>{{ ihale.olusturan_kullanici.username|default:"Sistem"|upper }}</b></span>
+                <span>Değiştirilme: <b>{{ ihale.guncellenme_tarihi|date:"d.m.Y H:i" }}</b></span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Bu filtreye uygun ihale yok.</p>
+        {% endfor %}
+
+        <h6 class="section-title mt-5"><i class="fas fa-bolt me-2" style="color: var(--ekap-green);"></i>Doğrudan Teminler ({{ dogrudan_teminler|length }})</h6>
+        {% for ihale in dogrudan_teminler %}
+        <div class="ihale-card dt">
+            <div class="d-flex justify-content-between align-items-start">
+                <div class="w-100">
+                    <div class="d-flex align-items-center mb-2 gap-2">
+                        <span class="badge bg-success text-uppercase"><i class="fas {% if ihale.tur == 'Hizmet' %}fa-tools{% elif ihale.tur == 'Yapım' %}fa-hard-hat{% else %}fa-box{% endif %} me-1"></i>{{ ihale.tur|default:"Mal" }}</span>
+                        <span class="badge {% if ihale.durum == 'Acik' %}bg-success{% else %}bg-secondary{% endif %} text-uppercase small">{% if ihale.durum == 'Acik' %}Açık{% else %}Kapalı{% endif %}</span>
+                        {% if ihale.cetvel_dosya %}<a href="{{ ihale.cetvel_dosya.url }}" target="_blank" class="btn btn-outline-primary file-link-btn"><i class="fas fa-file-excel"></i> Cetvel</a>{% endif %}
+                        {% if ihale.sartname_dosya %}<a href="{{ ihale.sartname_dosya.url }}" target="_blank" class="btn btn-outline-danger file-link-btn"><i class="fas fa-file-pdf"></i> Şartname</a>{% endif %}
+                    </div>
+                    <span class="d-flex align-items-center gap-2 flex-wrap">
+                        <a href="/ihale/{{ ihale.pk }}/incele/" class="ihale-main-link mb-0">{{ ihale.ihale_adi }}</a>
+                        <a href="/ihale/{{ ihale.pk }}/incele/" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:0.75rem;">İncele</a>
+                    </span>
+                    <div class="small text-muted mb-0 mt-1"><i class="fas fa-map-marker-alt me-1"></i> {{ ihale.hastane.ad }} | <b>{{ ihale.il }}</b> · <b>Durum:</b> {{ ihale.is_durumu|default:"Doğrudan temin süreci aktif." }}</div>
+                </div>
+                <div class="ihale-sag-meta">
+                    <a href="{% url 'ihale_sil' ihale.pk %}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="btn-delete-ihale"><i class="fas fa-trash-alt"></i></a>
+                    <div class="ihale-no-tarih">
+                        <span class="fw-bold text-success">{{ ihale.ihale_no }}</span>
+                        <span class="small text-muted d-block mt-1"><i class="far fa-clock me-1"></i>{{ ihale.tarih|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="ihale-footer-info">
+                <span>Yükleyen: <b>{{ ihale.olusturan_kullanici.username|default:"Sistem"|upper }}</b></span>
+                <span>Son İşlem: <b>{{ ihale.guncellenme_tarihi|date:"d.m.Y H:i" }}</b></span>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Bu filtreye uygun doğrudan temin yok.</p>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

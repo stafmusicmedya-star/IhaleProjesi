@@ -1,0 +1,117 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Ürün Geçmiş Analizi – {{ urun.urun_adi|truncatechars:50 }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --meysa-blue: #1a5695; --meysa-green: #28a745; --bg-gray: #f4f7fa; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; color: var(--text-primary); }
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid var(--border-mid); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .nav-capsule a:hover { color: var(--meysa-blue); }
+        .nav-upload-btn { background: var(--meysa-blue); color: white !important; padding: 6px 15px; border-radius: 20px; font-weight: 800 !important; }
+        .nav-user-block { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 14px; border-radius: 50px; border: 1px solid #e9ecef; }
+        .nav-user-block .nav-username { font-size: 13px; font-weight: 600; color: var(--meysa-blue); text-transform: uppercase; letter-spacing: 0.3px; }
+        .nav-user-block .btn-logout { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
+        .stats-card { background: white; border-radius: 15px; border: 1px solid #e0e6ed; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+        .section-title { font-size: 14px; font-weight: 700; color: var(--meysa-blue); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; }
+        .table-custom { font-size: 13px; }
+        .toplam-kar { font-size: 1.2rem; font-weight: 700; }
+        .toplam-kar.positive { color: var(--meysa-green); }
+        .toplam-kar.negative { color: #dc3545; }
+    </style>
+</head>
+<body>
+
+<nav class="ekap-navbar">
+    <a href="{% url 'ana_sayfa' %}"><img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;"></a>
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+        <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn"><i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme</a>
+        <a href="{% url 'arabalar' %}">Arabalar</a>
+        <a href="{% url 'analiz' %}">Analiz</a>
+        <a href="{% url 'urun_katalog' %}"><i class="fas fa-box me-1"></i> Ürün Katalog</a>
+        <a href="{% url 'mesailerim' %}">Mesailerim</a>
+        <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+    </div>
+    <div class="nav-user-block">
+        <span class="nav-username">{{ user.username }}</span>
+        <form action="/admin/logout/" method="post" style="display:inline; margin:0;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger btn-logout">Çıkış</button></form>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Ürün Geçmiş Analizi</h5>
+        <a href="{% url 'urun_katalog' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-arrow-left me-1"></i> Kataloga Dön</a>
+    </div>
+
+    <div class="stats-card p-4 mb-4">
+        <h6 class="section-title">{{ urun.urun_adi }}</h6>
+        <p class="text-muted small mb-0">Katalog ID: {{ urun.pk }}{% if urun.marka %} | Marka: {{ urun.marka }}{% endif %} | Son alış fiyatı: {{ urun.son_alis_fiyati|floatformat:2 }} TL</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stats-card p-3 text-center">
+                <div class="text-muted small">Toplam Alış (Gerçekleşen)</div>
+                <div class="fw-bold">{{ toplam_alis|floatformat:2 }} TL</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card p-3 text-center">
+                <div class="text-muted small">Toplam Satış</div>
+                <div class="fw-bold">{{ toplam_satis|floatformat:2 }} TL</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card p-3 text-center">
+                <div class="text-muted small">Toplam Kâr</div>
+                <div class="toplam-kar {% if toplam_kar >= 0 %}positive{% else %}negative{% endif %}">{{ toplam_kar|floatformat:2 }} TL</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-card p-4">
+        <h6 class="section-title"><i class="fas fa-list me-2"></i>Bu Ürünün Kullanıldığı İhaleler ({{ kalem_sayisi }} kalem)</h6>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle table-custom">
+                <thead class="table-light">
+                    <tr>
+                        <th>İhale No / Adı</th>
+                        <th class="text-end">Alış (TL)</th>
+                        <th class="text-end">Satış (TL)</th>
+                        <th class="text-end">Kâr (TL)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in satirlar %}
+                    <tr>
+                        <td>
+                            <strong>{{ s.ihale.ihale_no }}</strong><br>
+                            <span class="text-muted small">{{ s.ihale.ihale_adi|truncatechars:40 }}</span>
+                        </td>
+                        <td class="text-end">{{ s.alis|floatformat:2 }}</td>
+                        <td class="text-end">{{ s.satis|floatformat:2 }}</td>
+                        <td class="text-end {% if s.kar >= 0 %}text-success{% else %}text-danger{% endif %}">{{ s.kar|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">Bu ürünle ilişkili ihale kalemi bulunamadı.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

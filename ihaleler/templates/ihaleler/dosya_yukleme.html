@@ -8,15 +8,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --ekap-blue: #1a5695; --ekap-green: #28a745; --bg-gray: #f4f7fa; }
-        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        :root { --ekap-blue: #1a5695; --ekap-green: #28a745; --bg-gray: #f4f7fa; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; color: var(--text-primary); }
         
         /* NAVBAR */
-        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background: white; position: sticky; top: 0; z-index: 1000; }
-        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
-        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-mid); background: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
         .nav-capsule a:hover { color: var(--ekap-blue); }
         .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+        .nav-user-block { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 14px; border-radius: 50px; border: 1px solid #e9ecef; }
+        .nav-user-block .nav-username { font-size: 13px; font-weight: 600; color: var(--ekap-blue); text-transform: uppercase; letter-spacing: 0.3px; }
+        .nav-user-block .btn-logout { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
 
         .nav-upload-btn { 
             background: var(--ekap-blue); 
@@ -129,43 +132,52 @@
 <body>
 
     <div id="loading-overlay">
-        <div class="ai-pulse mb-4">
-            <i class="fas fa-brain fa-3x text-primary"></i>
+        <div id="loading-content">
+            <div class="ai-pulse mb-4">
+                <i class="fas fa-brain fa-3x text-primary"></i>
+            </div>
+            <h4 class="fw-bold text-dark">Gemini AI Dosyaları Analiz Ediyor...</h4>
+            <p class="text-muted">Bu işlem dosyaların boyutuna göre 10-30 saniye sürebilir.</p>
+            <div class="progress w-25 mt-2" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+            </div>
         </div>
-        <h4 class="fw-bold text-dark">Gemini AI Dosyaları Analiz Ediyor...</h4>
-        <p class="text-muted">Bu işlem dosyaların boyutuna göre 10-30 saniye sürebilir.</p>
-        <div class="progress w-25 mt-2" style="height: 6px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 100%"></div>
+        <div id="loading-error" style="display: none; text-align: center;">
+            <div class="mb-4"><i class="fas fa-wifi fa-3x text-danger"></i></div>
+            <h4 class="fw-bold text-dark">İnternet bağlantınız gitti</h4>
+            <p class="text-muted mb-4">Bağlantıyı kontrol edip aynı bilgi ve dosyalarla tekrar deneyin.</p>
+            <button type="button" class="btn btn-primary btn-lg" id="retryUploadBtn"><i class="fas fa-redo me-2"></i>Tekrar Dene</button>
         </div>
     </div>
 
     <nav class="ekap-navbar">
-        <a href="{% url 'ana_sayfa' %}">
-            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    <a href="{% url 'ana_sayfa' %}">
+        <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    </a>
+
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+
+        <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+            <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
         </a>
-        <div class="nav-capsule">
-            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
-            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
-            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
-            <a href="{% url 'dosya_yukleme' %}" class="active">
-                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
-            </a>
-            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
-            <div style="width:1px; height:20px; background:#ddd;"></div>
-            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
-            <a href="{% url 'mesailerim_sayfasi' %}">Mesailerim</a>
-            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            {% if user.is_authenticated %}
-                <span class="fw-bold text-uppercase" style="font-size: 11px; color: var(--ekap-blue);">{{ user.username }}</span>
-                <form action="/admin/logout/" method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
-                </form>
-            {% endif %}
-        </div>
-    </nav>
+
+        <a href="{% url 'arabalar' %}">Arabalar</a>
+
+        <div style="width:1px; height:20px; background:#ddd;"></div>
+        <a href="{% url 'analiz' %}" class="active">Analiz</a>
+        <a href="{% url 'mesailerim' %}">Mesailerim</a>
+        <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+    </div>
+
+    <div class="nav-user-block">
+        <span class="nav-username">{{ user.username }}</span>
+        <form action="/admin/logout/" method="post" style="display:inline; margin:0;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger btn-logout">Çıkış</button></form>
+    </div>
+</nav>
 
     <div class="container">
         {% if messages %}
@@ -206,7 +218,49 @@
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Kurum (Hastane) Adı</label>
-                        <input type="text" name="kurum_adi" class="form-control" placeholder="Örn: Pendik Eğitim ve Araştırma Hastanesi" required>
+                        <select name="kurum_adi" class="form-select" id="kurumSelect" required>
+                            <option value="">— Hastane seçin —</option>
+                            <optgroup label="İstanbul – Devlet Hastaneleri (Avrupa Yakası)" data-il="İstanbul">
+                                <option value="Bakırköy Dr. Sadi Konuk Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Bakırköy Dr. Sadi Konuk Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Bağcılar Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Bağcılar Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Haseki Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Haseki Eğitim ve Araştırma Hastanesi</option>
+                                <option value="İstanbul Eğitim ve Araştırma Hastanesi" data-il="İstanbul">İstanbul Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Kanuni Sultan Süleyman Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Kanuni Sultan Süleyman Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Kartal Dr. Lütfi Kırdar Şehir Hastanesi" data-il="İstanbul">Kartal Dr. Lütfi Kırdar Şehir Hastanesi</option>
+                                <option value="Okmeydanı Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Okmeydanı Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Sultan 2. Abdülhamid Han Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Sultan 2. Abdülhamid Han Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Taksim Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Taksim Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Ümraniye Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Ümraniye Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Yeni Yüzyıl Üniversitesi Gaziosmanpaşa Hastanesi" data-il="İstanbul">Yeni Yüzyıl Üniversitesi Gaziosmanpaşa Hastanesi</option>
+                            </optgroup>
+                            <optgroup label="İstanbul – Devlet Hastaneleri (Anadolu Yakası)" data-il="İstanbul">
+                                <option value="Beykoz Devlet Hastanesi" data-il="İstanbul">Beykoz Devlet Hastanesi</option>
+                                <option value="Çekmeköy Devlet Hastanesi" data-il="İstanbul">Çekmeköy Devlet Hastanesi</option>
+                                <option value="Fatih Sultan Mehmet Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Fatih Sultan Mehmet Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Göztepe Şehir Hastanesi" data-il="İstanbul">Göztepe Şehir Hastanesi</option>
+                                <option value="Haydarpaşa Numune Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Haydarpaşa Numune Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Kartal Şehir Hastanesi" data-il="İstanbul">Kartal Şehir Hastanesi</option>
+                                <option value="Maltepe Devlet Hastanesi" data-il="İstanbul">Maltepe Devlet Hastanesi</option>
+                                <option value="Pendik Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Pendik Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Sancaktepe İlhan Varank Hastanesi" data-il="İstanbul">Sancaktepe İlhan Varank Hastanesi</option>
+                                <option value="Şile Devlet Hastanesi" data-il="İstanbul">Şile Devlet Hastanesi</option>
+                                <option value="Sultanbeyli Devlet Hastanesi" data-il="İstanbul">Sultanbeyli Devlet Hastanesi</option>
+                                <option value="Tuzla Devlet Hastanesi" data-il="İstanbul">Tuzla Devlet Hastanesi</option>
+                                <option value="Üsküdar Devlet Hastanesi" data-il="İstanbul">Üsküdar Devlet Hastanesi</option>
+                            </optgroup>
+                            <optgroup label="İstanbul – Üniversite Hastaneleri" data-il="İstanbul">
+                                <option value="İstanbul Üniversitesi İstanbul Tıp Fakültesi" data-il="İstanbul">İstanbul Üniversitesi İstanbul Tıp Fakültesi</option>
+                                <option value="İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi" data-il="İstanbul">İstanbul Üniversitesi Cerrahpaşa Tıp Fakültesi</option>
+                                <option value="Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi" data-il="İstanbul">Marmara Üniversitesi Pendik Eğitim ve Araştırma Hastanesi</option>
+                                <option value="Marmara Üniversitesi Başıbüyük Asaf Ataseven Hastanesi" data-il="İstanbul">Marmara Üniversitesi Başıbüyük Asaf Ataseven Hastanesi</option>
+                                <option value="Yıldız Teknik Üniversitesi Davutpaşa Kampüsü" data-il="İstanbul">Yıldız Teknik Üniversitesi Davutpaşa Kampüsü</option>
+                                <option value="Bezm-i Âlem Vakıf Üniversitesi Hastanesi" data-il="İstanbul">Bezm-i Âlem Vakıf Üniversitesi Hastanesi</option>
+                                <option value="Acıbadem Üniversitesi Hastanesi" data-il="İstanbul">Acıbadem Üniversitesi Hastanesi</option>
+                                <option value="Koç Üniversitesi Hastanesi" data-il="İstanbul">Koç Üniversitesi Hastanesi</option>
+                                <option value="Medipol Üniversitesi Hastanesi" data-il="İstanbul">Medipol Üniversitesi Hastanesi</option>
+                                <option value="Yeditepe Üniversitesi Hastanesi" data-il="İstanbul">Yeditepe Üniversitesi Hastanesi</option>
+                            </optgroup>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">İhale Tarihi</label>
@@ -214,17 +268,32 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">İl</label>
-                        <input type="text" name="il" class="form-control" placeholder="Örn: İstanbul">
+                        <select name="il" class="form-select" id="ilSelect">
+                            <option value="İstanbul">İstanbul</option>
+                            <option value="Ankara">Ankara</option>
+                            <option value="İzmir">İzmir</option>
+                            <option value="Bursa">Bursa</option>
+                            <option value="Antalya">Antalya</option>
+                            <option value="Adana">Adana</option>
+                            <option value="Kocaeli">Kocaeli</option>
+                            <option value="Konya">Konya</option>
+                            <option value="Gaziantep">Gaziantep</option>
+                            <option value="Mersin">Mersin</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label class="form-label">İhale Kayıt No (İKN)</label>
-                        <div class="d-flex align-items-center">
-                            <input type="text" name="ikn_yil" class="form-control text-center" placeholder="Yıl" maxlength="4" style="width: 100px;" value="2025" required>
-                            <div class="ikn-separator">/</div>
-                            <input type="text" name="ikn_no" class="form-control" placeholder="Sıra No" required>
+                        <div class="d-flex align-items-center gap-2 flex-nowrap">
+                            <select name="ikn_yil" class="form-select text-center flex-shrink-0" style="width: 90px;" required>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                            </select>
+                            <span class="text-muted fw-bold" style="flex-shrink: 0;">/</span>
+                            <input type="text" name="ikn_no" class="form-control flex-grow-1" placeholder="Sıra No" style="min-width: 100px;" required>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -243,18 +312,22 @@
                     <div class="col-md-6">
                         <div class="upload-area text-center h-100">
                             <i class="fas fa-file-invoice-dollar fa-2x text-muted mb-2"></i>
-                            <h6 class="fw-bold">Birim Fiyat Cetveli</h6>
-                            <p class="small text-muted">Birim ve Miktar Analizi İçin</p>
-                            <input type="file" name="dosya" class="form-control shadow-sm" accept=".pdf,.xlsx,.xls" required>
+                            <h6 class="fw-bold">Birim Fiyat Cetveli (en fazla 3 dosya)</h6>
+                            <p class="small text-muted">Tüm formatlar: PDF, Excel, Word vb.</p>
+                            <input type="file" name="dosya" class="form-control shadow-sm" required>
+                            <input type="file" name="dosya_2" class="form-control shadow-sm mt-2">
+                            <input type="file" name="dosya_3" class="form-control shadow-sm mt-2">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="upload-area text-center h-100" style="border-color: #6a11cb; background: #fcfaff;">
                             <i class="fas fa-scroll fa-2x text-primary mb-2"></i>
-                            <h6 class="fw-bold">Teknik Şartname <span class="ai-badge">KALEM EŞLEŞTİRME</span></h6>
-                            <p class="small text-muted">Ürün Detayları İçin (PDF)</p>
-                            <input type="file" name="teknik_sartname" class="form-control shadow-sm" accept=".pdf,.doc,.docx">
+                            <h6 class="fw-bold">Teknik Şartname <span class="ai-badge">KALEM EŞLEŞTİRME</span> (en fazla 3 dosya)</h6>
+                            <p class="small text-muted">Tüm formatlar kabul edilir.</p>
+                            <input type="file" name="teknik_sartname" class="form-control shadow-sm">
+                            <input type="file" name="teknik_sartname_2" class="form-control shadow-sm mt-2">
+                            <input type="file" name="teknik_sartname_3" class="form-control shadow-sm mt-2">
                         </div>
                     </div>
                 </div>
@@ -268,16 +341,78 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Form gönderildiğinde yükleme ekranını göster
-        document.getElementById('uploadForm').onsubmit = function() {
-            // Basit bir validasyon kontrolü (dosya seçilmiş mi?)
-            const fileInput = document.querySelector('input[name="dosya"]');
-            if(fileInput.files.length > 0) {
-                document.getElementById('loading-overlay').style.display = 'flex';
-                document.getElementById('submitBtn').disabled = true;
-                document.getElementById('submitBtn').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> AI Verileri İşliyor...';
+        (function() {
+            var form = document.getElementById('uploadForm');
+            var overlay = document.getElementById('loading-overlay');
+            var loadingContent = document.getElementById('loading-content');
+            var loadingError = document.getElementById('loading-error');
+            var submitBtn = document.getElementById('submitBtn');
+            var retryBtn = document.getElementById('retryUploadBtn');
+
+            function showLoading() {
+                loadingContent.style.display = 'block';
+                loadingError.style.display = 'none';
+                overlay.style.display = 'flex';
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> AI Verileri İşliyor...';
             }
-        };
+            function showError() {
+                loadingContent.style.display = 'none';
+                loadingError.style.display = 'block';
+            }
+            function hideOverlay() {
+                overlay.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-magic me-2"></i> DOSYALARI ANALİZ ET VE SİSTEME İŞLE';
+            }
+
+            function doSubmit() {
+                var fileInput = document.querySelector('input[name="dosya"]');
+                if (!fileInput || fileInput.files.length === 0) return;
+                showLoading();
+                var formData = new FormData(form);
+                fetch(form.action || '', {
+                    method: 'POST',
+                    body: formData,
+                    redirect: 'follow',
+                    credentials: 'same-origin'
+                }).then(function(res) {
+                    if (!res.ok) {
+                        showError();
+                        return;
+                    }
+                    if (res.redirected) {
+                        window.location.href = res.url;
+                        return;
+                    }
+                    window.location.reload();
+                }).catch(function() {
+                    showError();
+                });
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                doSubmit();
+            });
+            retryBtn.addEventListener('click', function() {
+                doSubmit();
+            });
+        })();
+        (function() {
+            var kurumSelect = document.getElementById('kurumSelect');
+            var ilSelect = document.getElementById('ilSelect');
+            if (kurumSelect && ilSelect) {
+                kurumSelect.addEventListener('change', function() {
+                    var opt = kurumSelect.options[kurumSelect.selectedIndex];
+                    var il = opt && opt.getAttribute('data-il');
+                    if (!il && opt && opt.parentNode && opt.parentNode.getAttribute) il = opt.parentNode.getAttribute('data-il');
+                    if (il) {
+                        if (ilSelect.querySelector('option[value="' + il + '"]')) ilSelect.value = il;
+                    }
+                });
+            }
+        })();
     </script>
 </body>
 </html>

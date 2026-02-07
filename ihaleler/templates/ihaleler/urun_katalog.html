@@ -1,0 +1,87 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEYSA TEKNİK | Ürün Katalog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --meysa-blue: #1a5695; --meysa-green: #28a745; --bg-gray: #f4f7fa; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; color: var(--text-primary); }
+        .ekap-navbar { padding: 15px 40px; background: white; border-bottom: 1px solid var(--border-mid); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; }
+        .nav-capsule a:hover { color: var(--meysa-blue); }
+        .nav-capsule a.active { color: var(--meysa-blue); font-weight: 700; }
+        .nav-upload-btn { background: var(--meysa-blue); color: white !important; padding: 6px 15px; border-radius: 20px; font-weight: 800 !important; }
+        .nav-user-block { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 14px; border-radius: 50px; border: 1px solid #e9ecef; }
+        .nav-user-block .nav-username { font-size: 13px; font-weight: 600; color: var(--meysa-blue); text-transform: uppercase; letter-spacing: 0.3px; }
+        .nav-user-block .btn-logout { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
+        .stats-card { background: white; border-radius: 15px; border: 1px solid #e0e6ed; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+        .section-title { font-size: 14px; font-weight: 700; color: var(--meysa-blue); border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; }
+        .table-custom { font-size: 13px; }
+        .badge-kalem { background: #e0f2fe; color: #0369a1; font-weight: 700; border-radius: 8px; padding: 5px 12px; }
+    </style>
+</head>
+<body>
+
+<nav class="ekap-navbar">
+    <a href="{% url 'ana_sayfa' %}"><img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;"></a>
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+        <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn"><i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme</a>
+        <a href="{% url 'arabalar' %}">Arabalar</a>
+        <a href="{% url 'analiz' %}">Analiz</a>
+        <a href="{% url 'urun_katalog' %}" class="active"><i class="fas fa-box me-1"></i> Ürün Katalog</a>
+        <a href="{% url 'mesailerim' %}">Mesailerim</a>
+        <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+    </div>
+    <div class="nav-user-block">
+        <span class="nav-username">{{ user.username }}</span>
+        <form action="/admin/logout/" method="post" style="display:inline; margin:0;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger btn-logout">Çıkış</button></form>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="stats-card p-4">
+        <h6 class="section-title"><i class="fas fa-box-open me-2"></i>Ürün Katalog – Geçmişte Kullanılan Ürünler</h6>
+        <p class="text-muted small mb-3">Her ürün benzersiz ID ile eşleştirilir; geçmiş alış/satış ve kar analizi için tıklayın.</p>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle table-custom">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Ürün Adı</th>
+                        <th class="text-center">Kalem Sayısı</th>
+                        <th class="text-center">İhale Sayısı</th>
+                        <th class="text-end">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in urunler %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ u.urun_adi|truncatechars:60 }}</strong>{% if u.marka %} <span class="text-muted small">({{ u.marka }})</span>{% endif %}</td>
+                        <td class="text-center"><span class="badge-kalem">{{ u.kalem_sayisi }}</span></td>
+                        <td class="text-center">{{ u.ihale_sayisi }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'urun_gecmis_analiz' u.pk %}" class="btn btn-sm btn-outline-primary">Geçmiş Analiz</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Henüz katalogda ürün yok. İhale kalemleri eklendikçe otomatik eşleşir.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

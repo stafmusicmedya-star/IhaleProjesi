@@ -2,14 +2,19 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Proje dizini
+# =====================
+# BASE DIR
+# =====================
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Log dizini (parsing logları için)
+(BASE_DIR / "logs").mkdir(exist_ok=True)
 
 # .env yükle
 load_dotenv(BASE_DIR / ".env")
 
 # =====================
-# GÜVENLİK
+# SECURITY
 # =====================
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
@@ -24,7 +29,7 @@ ALLOWED_HOSTS = [
 ]
 
 # =====================
-# UYGULAMALAR
+# APPLICATIONS
 # =====================
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,12 +59,12 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'ihale_sistemi.urls'
 
 # =====================
-# TEMPLATE
+# TEMPLATES
 # =====================
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # ileride lazım olacak
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,7 +90,7 @@ DATABASES = {
 }
 
 # =====================
-# PASSWORD
+# PASSWORD VALIDATION
 # =====================
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -106,7 +111,7 @@ THOUSAND_SEPARATOR = '.'
 NUMBER_GROUPING = 3
 
 # =====================
-# STATIC
+# STATIC FILES
 # =====================
 STATIC_URL = '/static/'
 
@@ -125,13 +130,60 @@ LOGOUT_REDIRECT_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # =====================
-# GEMINI
+# AI API (en az biri gerekli: dosya yükleme → kalem çıkarma)
+# .env dosyasına ekleyin. Sadece OPENAI_API_KEY yeterli (cetvel + şartname eşleştirme).
 # =====================
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-# =====================
-# GEMINI
-# =====================
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# İsteğe bağlı: Kalem çıkarma için model (boşsa sırayla gemini-2.5-flash, gemini-2.0-flash denenecek)
+GEMINI_MODEL = (os.getenv("GEMINI_MODEL") or "").strip() or None
 
-if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY bulunamadı (.env okunmuyor)")
+# =====================
+# OCR (Tesseract) - Resim/tarama metin tanıma
+# =====================
+# Windows: Tesseract-OCR kurulu olmalı (https://github.com/UB-Mannheim/tesseract/wiki)
+# .env'de TESSERACT_CMD boş bırakılırsa Windows'ta aşağıdaki varsayılan kullanılır
+TESSERACT_CMD = os.getenv(
+    "TESSERACT_CMD",
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe" if os.name == "nt" else None,
+)
+# OCR dil kodu: tur=Türkçe, eng=İngilizce. Birden fazla için: "tur+eng"
+OCR_LANG = os.getenv("OCR_LANG", "tur")
+# PSM: 6 = Tek blok metin, 3 = Tam otomatik (detay: https://github.com/tesseract-ocr/tesseract/wiki)
+OCR_PSM = os.getenv("OCR_PSM", "6")
+
+# =====================
+# LOGGING - Dosya / cetvel / şartname işleme (hata payını azaltmak için)
+# =====================
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "parsing": {
+            "format": "%(asctime)s [%(levelname)s] %(name)s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "parsing_file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "parsing.log",
+            "formatter": "parsing",
+            "encoding": "utf-8",
+        },
+        "parsing_console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "parsing",
+        },
+    },
+    "loggers": {
+        "ihaleler.parsing": {
+            "handlers": ["parsing_file", "parsing_console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}

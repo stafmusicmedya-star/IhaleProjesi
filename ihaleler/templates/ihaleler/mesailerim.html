@@ -8,15 +8,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; }
-        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        :root { --ekap-blue: #1a5695; --bg-gray: #f4f7fa; --text-primary: #2d2d2d; --border-mid: #e0e0e0; }
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; color: var(--text-primary); }
         
         /* NAVBAR (Tam Uyumlu) */
-        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f0f0f0; background: white; position: sticky; top: 0; z-index: 1000; }
-        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 5px 20px; border: 1px solid #eee; display: flex; gap: 12px; align-items: center; }
-        .nav-capsule a { text-decoration: none; color: #444; font-size: 12px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
+        .ekap-navbar { padding: 15px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-mid); background: white; position: sticky; top: 0; z-index: 1000; }
+        .nav-capsule { background: #f8f9fa; border-radius: 50px; padding: 6px 20px; border: 1px solid var(--border-mid); display: flex; gap: 14px; align-items: center; }
+        .nav-capsule a { text-decoration: none; color: var(--text-primary); font-size: 13px; font-weight: 500; transition: 0.2s; white-space: nowrap; }
         .nav-capsule a:hover { color: var(--ekap-blue); }
         .nav-capsule a.active { color: var(--ekap-blue); font-weight: 700; }
+        .nav-user-block { display: flex; align-items: center; gap: 10px; background: #f8f9fa; padding: 8px 14px; border-radius: 50px; border: 1px solid #e9ecef; }
+        .nav-user-block .nav-username { font-size: 13px; font-weight: 600; color: var(--ekap-blue); text-transform: uppercase; letter-spacing: 0.3px; }
+        .nav-user-block .btn-logout { font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 600; }
 
         /* ÖZEL VURGULU DOSYA YÜKLEME BUTONU */
         .nav-upload-btn { 
@@ -88,33 +91,33 @@
 <body>
 
     <nav class="ekap-navbar">
-        <a href="{% url 'ana_sayfa' %}">
-            <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    <a href="{% url 'ana_sayfa' %}">
+        <img src="{% static 'img/meysa_logo.jpeg' %}" style="height: 55px;">
+    </a>
+
+    <div class="nav-capsule">
+        <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
+        <a href="{% url 'ihale_listesi' %}">İhaleler</a>
+        <a href="{% url 'dogrudan_temin_listesi' %}">Doğrudan Teminler</a>
+
+        <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
+            <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
         </a>
-        <div class="nav-capsule">
-            <a href="{% url 'ana_sayfa' %}">Anasayfa</a>
-            <a href="{% url 'ihale_listesi' %}">İhaleler</a>
-            <a href="{% url 'dogrudan_temin' %}">Doğrudan Teminler</a>
-            
-            <a href="{% url 'dosya_yukleme' %}" class="nav-upload-btn">
-                <i class="fas fa-cloud-upload-alt me-1"></i> Dosya Yükleme
-            </a>
-            
-            <a href="{% url 'arabalar_sayfasi' %}">Arabalar</a>
-            
-            <div style="width:1px; height:20px; background:#ddd;"></div>
-            <a href="{% url 'analiz_sayfasi' %}" style="color: var(--ekap-blue);">Analiz</a>
-            <a href="{% url 'mesailerim_sayfasi' %}" class="active">Mesailerim</a>
-            <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
-        </div>
-        <div>
-            <span class="fw-bold text-uppercase" style="font-size: 11px; color: #666;">{{ user.username }}</span>
-            <form action="/admin/logout/" method="post" style="display:inline; margin-left: 10px;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-danger border-0 fw-bold" style="font-size: 11px;">ÇIKIŞ</button>
-            </form>
-        </div>
-    </nav>
+
+        <a href="{% url 'arabalar' %}">Arabalar</a>
+
+        <div style="width:1px; height:20px; background:#ddd;"></div>
+        <a href="{% url 'analiz' %}" class="active">Analiz</a>
+        <a href="{% url 'mesailerim' %}">Mesailerim</a>
+        <a href="{% url 'profilim' %}" style="color: #28a745; font-weight: 700;">Profilim</a>
+        <a href="{% url 'iletisim' %}">İletişim <i class="fas fa-phone-alt ms-1"></i></a>
+    </div>
+
+    <div class="nav-user-block">
+        <span class="nav-username">{{ user.username }}</span>
+        <form action="/admin/logout/" method="post" style="display:inline; margin:0;">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger btn-logout">Çıkış</button></form>
+    </div>
+</nav>
 
     <div class="container">
         <div class="work-card">
